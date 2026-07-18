@@ -57,4 +57,4 @@ static func _get_stat_value(stat_name: String) -> float:
 			return float(GameState.house_tier)
 		_:
 			push_error("ButtonData: unknown stat \"%s\" in unlock_condition" % stat_name)
-			return 0.0
+			return -INF
