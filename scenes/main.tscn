@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/area_tab.tscn" id="2"]
 [ext_resource type="Resource" path="res://data/areas/house.tres" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/ui/log_panel.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/ui/blackout_overlay.tscn" id="5"]
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
@@ -24,3 +25,5 @@ area_data = ExtResource("3")
 
 [node name="LogPanel" parent="Root" instance=ExtResource("4")]
 custom_minimum_size = Vector2(0, 150)
+
+[node name="BlackoutOverlay" parent="." instance=ExtResource("5")]
