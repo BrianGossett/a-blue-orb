@@ -13,7 +13,7 @@ var resources: Dictionary = {
 var confidence_tier: int = 0
 var house_tier: int = 0
 var purchased_upgrades: Array[String] = []
-var orb_mana_per_click: float = 0.0
+var orb_mana_per_click: float = 1.0
 var orb_mana_per_second: float = 0.0
 var is_blacked_out: bool = false
 
@@ -67,6 +67,18 @@ func mark_upgrade_purchased(id: String) -> void:
 	EventBus.upgrade_purchased.emit(id)
 
 
+func add_orb_mana_per_click(amount: float) -> void:
+	orb_mana_per_click += amount
+
+
+func add_orb_mana_per_second(amount: float) -> void:
+	orb_mana_per_second += amount
+
+
+func advance_confidence_tier() -> void:
+	confidence_tier = min(confidence_tier + 1, 4)
+
+
 func to_dict() -> Dictionary:
 	return {
 		"mana": mana,
@@ -92,6 +104,6 @@ func from_dict(data: Dictionary) -> void:
 	confidence_tier = data.get("confidence_tier", 0)
 	house_tier = data.get("house_tier", 0)
 	purchased_upgrades.assign(data.get("purchased_upgrades", []))
-	orb_mana_per_click = data.get("orb_mana_per_click", 0.0)
+	orb_mana_per_click = data.get("orb_mana_per_click", 1.0)
 	orb_mana_per_second = data.get("orb_mana_per_second", 0.0)
 	is_blacked_out = data.get("is_blacked_out", false)
