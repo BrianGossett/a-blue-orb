@@ -1,0 +1,9 @@
+[gd_resource type="AreaData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/area_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "house"
+name_progression = Array[String](["A Small Shelter", "A Lonely Hut", "A Sturdy Cottage", "A Comfortable House", "A Fine Residence"])
+base_description = "You are in a small room."
