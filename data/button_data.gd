@@ -17,6 +17,8 @@ extends Resource
 @export var tier_source: String
 @export var cost_count_source: String
 @export var room_description_fragment: String
+@export var max_purchases: int
+@export var cooldown_gate_condition: String
 
 
 static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int) -> float:
