@@ -113,7 +113,8 @@ func _handle_click() -> void:
 		if not _deduct_cost(cost):
 			return
 	EffectHandler.run_effect(data.effect_id)
-	_purchase_count += 1
+	if data.tier_source == "":
+		_purchase_count += 1
 	_start_cooldown()
 	if data.one_shot:
 		one_shot_purchased.emit(data)
