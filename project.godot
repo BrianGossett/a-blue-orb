@@ -33,3 +33,4 @@ renderer/rendering_method.mobile="gl_compatibility"
 
 EventBus="*res://autoloads/event_bus.gd"
 GameState="*res://autoloads/game_state.gd"
+LogManager="*res://autoloads/log_manager.gd"
