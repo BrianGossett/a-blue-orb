@@ -7,6 +7,7 @@ var _purchase_count: int = 0
 var _is_on_cooldown: bool = false
 var _is_processing_click: bool = false
 var _is_blacked_out: bool = false
+var _cooldown_remaining: float = 0.0
 
 
 func set_data(new_data: ButtonData) -> void:
@@ -137,6 +138,9 @@ func _handle_click() -> void:
 		one_shot_purchased.emit(data)
 		hide()
 		return
+	if data.max_purchases > 0 and _purchase_count >= data.max_purchases:
+		hide()
+		return
 	_refresh()
 
 
@@ -154,10 +158,16 @@ func _start_cooldown() -> void:
 	if data.cooldown_sec <= 0.0:
 		return
 	_is_on_cooldown = true
+	_cooldown_remaining = data.cooldown_sec
 	disabled = true
-	get_tree().create_timer(data.cooldown_sec).timeout.connect(_on_cooldown_finished)
 
 
-func _on_cooldown_finished() -> void:
-	_is_on_cooldown = false
-	_refresh()
+func _process(delta: float) -> void:
+	if not _is_on_cooldown:
+		return
+	if data.cooldown_gate_condition != "" and not ButtonData.is_unlock_condition_met(data.cooldown_gate_condition):
+		return
+	_cooldown_remaining -= delta
+	if _cooldown_remaining <= 0.0:
+		_is_on_cooldown = false
+		_refresh()
