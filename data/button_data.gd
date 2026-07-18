@@ -14,6 +14,9 @@ extends Resource
 @export var one_shot: bool
 @export var button_column: int
 @export var sort_order: int
+@export var tier_source: String
+@export var cost_count_source: String
+@export var room_description_fragment: String
 
 
 static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int) -> float:
@@ -31,6 +34,11 @@ static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: fl
 
 static func is_unlock_condition_met(condition: String) -> bool:
 	if condition.is_empty():
+		return true
+	if "&&" in condition:
+		for sub_condition in condition.split("&&"):
+			if not is_unlock_condition_met(sub_condition.strip_edges()):
+				return false
 		return true
 	if condition.begins_with("has_upgrade("):
 		var inner := condition.trim_prefix("has_upgrade(").trim_suffix(")")
@@ -56,6 +64,8 @@ static func _get_stat_value(stat_name: String) -> float:
 			return float(GameState.confidence_tier)
 		"house_tier":
 			return float(GameState.house_tier)
+		"food_eaten_count":
+			return float(GameState.food_eaten_count)
 		_:
 			push_error("ButtonData: unknown stat \"%s\" in unlock_condition" % stat_name)
 			return -INF
