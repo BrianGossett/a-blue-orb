@@ -4,20 +4,21 @@
 
 [resource]
 script = ExtResource("1")
-id = "eat_bread"
-labels = Array[String](["Eat Bread"])
-cost_type = "none"
-base_cost = 0.0
-cost_scaling = "fixed"
+id = "better_bed"
+labels = Array[String](["A Better Bed"])
+cost_type = "familiars"
+base_cost = 8.0
+cost_scaling = "double"
 cost_step = 0.0
-cooldown_sec = 5.0
-cooldown_gate_condition = "familiars >= 1"
-unlock_condition = "familiars >= 1"
-effect_id = "eat_food"
+cooldown_sec = 0.0
+unlock_condition = "has_upgrade(\"bed\")"
+effect_id = "better_bed"
 flavor_lines = Array[String]([])
 one_shot = false
-button_column = 1
-sort_order = 3
+button_column = 2
+sort_order = 7
 tier_source = ""
 cost_count_source = ""
 room_description_fragment = ""
+max_purchases = 4
+cooldown_gate_condition = ""
