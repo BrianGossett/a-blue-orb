@@ -22,8 +22,33 @@ func set_purchase_count(value: int) -> void:
 
 func _ready() -> void:
 	pressed.connect(_on_pressed)
+	_connect_tier_source()
 	if data:
 		_refresh()
+
+
+func _connect_tier_source() -> void:
+	if data == null or data.tier_source == "":
+		return
+	match data.tier_source:
+		"confidence_tier":
+			EventBus.confidence_tier_changed.connect(_on_tier_source_changed)
+			set_purchase_count(GameState.confidence_tier)
+		"house_tier":
+			EventBus.house_tier_changed.connect(_on_tier_source_changed)
+			set_purchase_count(GameState.house_tier)
+
+
+func _on_tier_source_changed(new_tier: int) -> void:
+	set_purchase_count(new_tier)
+
+
+func _cost_count() -> int:
+	match data.cost_count_source:
+		"familiars":
+			return GameState.familiars
+		_:
+			return _purchase_count
 
 
 func _refresh() -> void:
@@ -38,7 +63,7 @@ func _build_label_text() -> String:
 	var label := data.labels[label_index]
 	if data.cost_type == "none":
 		return label
-	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _purchase_count)
+	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
 	return "%s (%s %s)" % [label, _format_cost(cost), data.cost_type]
 
 
@@ -59,7 +84,7 @@ func _is_disabled() -> bool:
 
 
 func _can_afford() -> bool:
-	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _purchase_count)
+	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
 	match data.cost_type:
 		"mana":
 			return GameState.mana >= cost
@@ -84,7 +109,7 @@ func _handle_click() -> void:
 		return
 	var cost := 0.0
 	if data.cost_type != "none":
-		cost = ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _purchase_count)
+		cost = ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
 		if not _deduct_cost(cost):
 			return
 	EffectHandler.run_effect(data.effect_id)
