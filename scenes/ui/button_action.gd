@@ -12,9 +12,24 @@ var _cooldown_remaining: float = 0.0
 
 func set_data(new_data: ButtonData) -> void:
 	data = new_data
-	_purchase_count = 0
+	_purchase_count = _seed_purchase_count()
 	_is_on_cooldown = false
+	if data.max_purchases > 0 and _purchase_count >= data.max_purchases:
+		hide()
+		return
 	_refresh()
+
+
+func _seed_purchase_count() -> int:
+	match data.count_seed_source:
+		"better_chair_level":
+			return GameState.better_chair_level
+		"better_table_level":
+			return GameState.better_table_level
+		"better_bed_level":
+			return GameState.better_bed_level
+		_:
+			return 0
 
 
 func set_purchase_count(value: int) -> void:
@@ -130,7 +145,9 @@ func _handle_click() -> void:
 		cost = ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
 		if not _deduct_cost(cost):
 			return
-	EffectHandler.run_effect(data.effect_id)
+	if not EffectHandler.run_effect(data.effect_id):
+		_refund_cost(cost)
+		return
 	if data.tier_source == "":
 		_purchase_count += 1
 	_start_cooldown()
@@ -142,6 +159,16 @@ func _handle_click() -> void:
 		hide()
 		return
 	_refresh()
+
+
+func _refund_cost(cost: float) -> void:
+	if data.cost_type == "none" or cost <= 0.0:
+		return
+	match data.cost_type:
+		"mana":
+			GameState.add_mana(cost)
+		"familiars":
+			GameState.add_familiars(int(cost))
 
 
 func _deduct_cost(cost: float) -> bool:

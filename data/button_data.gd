@@ -19,6 +19,7 @@ extends Resource
 @export var room_description_fragment: String
 @export var max_purchases: int
 @export var cooldown_gate_condition: String
+@export var count_seed_source: String
 
 
 static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int) -> float:
