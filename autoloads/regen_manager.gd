@@ -14,5 +14,5 @@ func _ready() -> void:
 
 
 func _on_tick() -> void:
-	if GameState.health_regen_per_minute > 0.0:
+	if GameState.health_regen_per_minute > 0.0 and not GameState.is_blacked_out:
 		GameState.add_health(GameState.health_regen_per_minute)

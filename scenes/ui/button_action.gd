@@ -6,6 +6,7 @@ var data: ButtonData
 var _purchase_count: int = 0
 var _is_on_cooldown: bool = false
 var _is_processing_click: bool = false
+var _is_blacked_out: bool = false
 
 
 func set_data(new_data: ButtonData) -> void:
@@ -23,6 +24,8 @@ func set_purchase_count(value: int) -> void:
 func _ready() -> void:
 	pressed.connect(_on_pressed)
 	_connect_tier_source()
+	EventBus.health_depleted.connect(_on_health_depleted)
+	EventBus.blackout_ended.connect(_on_blackout_ended)
 	if data:
 		_refresh()
 
@@ -41,6 +44,16 @@ func _connect_tier_source() -> void:
 
 func _on_tier_source_changed(new_tier: int) -> void:
 	set_purchase_count(new_tier)
+
+
+func _on_health_depleted() -> void:
+	_is_blacked_out = true
+	_refresh()
+
+
+func _on_blackout_ended() -> void:
+	_is_blacked_out = false
+	_refresh()
 
 
 func _cost_count() -> int:
@@ -74,6 +87,8 @@ func _format_cost(cost: float) -> String:
 
 
 func _is_disabled() -> bool:
+	if _is_blacked_out:
+		return true
 	if _is_on_cooldown:
 		return true
 	if not ButtonData.is_unlock_condition_met(data.unlock_condition):
@@ -104,6 +119,8 @@ func _on_pressed() -> void:
 
 func _handle_click() -> void:
 	if not InputGuard.try_register_click():
+		return
+	if _is_blacked_out:
 		return
 	if _is_on_cooldown:
 		return
