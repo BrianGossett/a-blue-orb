@@ -59,7 +59,7 @@ func _refresh() -> void:
 
 
 func _build_label_text() -> String:
-	var label_index := min(_purchase_count, data.labels.size() - 1)
+	var label_index: int = min(_purchase_count, data.labels.size() - 1)
 	var label := data.labels[label_index]
 	if data.cost_type == "none":
 		return label
