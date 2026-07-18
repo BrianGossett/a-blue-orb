@@ -171,4 +171,4 @@ func from_dict(data: Dictionary) -> void:
 	better_chair_level = data.get("better_chair_level", 0)
 	better_table_level = data.get("better_table_level", 0)
 	better_bed_level = data.get("better_bed_level", 0)
-	is_blacked_out = data.get("is_blacked_out", false)
+	is_blacked_out = false
