@@ -8,6 +8,8 @@ const BUTTON_ACTION_SCENE := preload("res://scenes/ui/button_action.tscn")
 @onready var _column_upgrades: VBoxContainer = $Root/Content/ButtonGrid/ColumnUpgrades
 @onready var _description_label: RichTextLabel = $Root/Content/RoomInfo/Description
 
+var _furniture_fragments: Array[String] = []
+
 
 func _ready() -> void:
 	EventBus.house_tier_changed.connect(_on_house_tier_changed)
@@ -53,7 +55,31 @@ func _load_buttons() -> void:
 	for button_data in button_datas:
 		var instance: Button = BUTTON_ACTION_SCENE.instantiate()
 		instance.set_data(button_data)
+		instance.one_shot_purchased.connect(_on_one_shot_purchased)
 		if button_data.button_column == 1:
 			_column_actions.add_child(instance)
 		else:
 			_column_upgrades.add_child(instance)
+
+
+func _on_one_shot_purchased(purchased_data: ButtonData) -> void:
+	if purchased_data.room_description_fragment == "":
+		return
+	_furniture_fragments.append(purchased_data.room_description_fragment)
+	_rebuild_description()
+
+
+func _rebuild_description() -> void:
+	if _furniture_fragments.is_empty():
+		_description_label.text = area_data.base_description
+		return
+	_description_label.text = "%s The room has %s." % [area_data.base_description, _join_with_commas_and(_furniture_fragments)]
+
+
+func _join_with_commas_and(items: Array[String]) -> String:
+	if items.size() == 1:
+		return items[0]
+	if items.size() == 2:
+		return "%s and %s" % [items[0], items[1]]
+	var all_but_last := items.slice(0, items.size() - 1)
+	return "%s, and %s" % [", ".join(all_but_last), items[items.size() - 1]]
