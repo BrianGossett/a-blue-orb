@@ -81,6 +81,7 @@ func add_orb_mana_per_second(amount: float) -> void:
 
 func advance_confidence_tier() -> void:
 	confidence_tier = min(confidence_tier + 1, 4)
+	EventBus.confidence_tier_changed.emit(confidence_tier)
 
 
 func add_food_eaten() -> void:
