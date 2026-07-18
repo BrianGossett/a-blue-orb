@@ -20,6 +20,9 @@ var food_eaten_count: int = 0
 var orb_health_cost_per_click: float = 5.0
 var food_heal_bonus: float = 0.0
 var health_regen_per_minute: float = 0.0
+var better_chair_level: int = 0
+var better_table_level: int = 0
+var better_bed_level: int = 0
 
 
 func add_mana(amount: float) -> void:
@@ -115,6 +118,18 @@ func add_max_health(amount: float) -> void:
 	EventBus.health_changed.emit(health, max_health)
 
 
+func advance_better_chair_level() -> void:
+	better_chair_level = min(better_chair_level + 1, 4)
+
+
+func advance_better_table_level() -> void:
+	better_table_level = min(better_table_level + 1, 4)
+
+
+func advance_better_bed_level() -> void:
+	better_bed_level = min(better_bed_level + 1, 4)
+
+
 func to_dict() -> Dictionary:
 	return {
 		"mana": mana,
@@ -131,6 +146,9 @@ func to_dict() -> Dictionary:
 		"orb_health_cost_per_click": orb_health_cost_per_click,
 		"food_heal_bonus": food_heal_bonus,
 		"health_regen_per_minute": health_regen_per_minute,
+		"better_chair_level": better_chair_level,
+		"better_table_level": better_table_level,
+		"better_bed_level": better_bed_level,
 		"is_blacked_out": is_blacked_out,
 	}
 
@@ -150,4 +168,7 @@ func from_dict(data: Dictionary) -> void:
 	orb_health_cost_per_click = data.get("orb_health_cost_per_click", 5.0)
 	food_heal_bonus = data.get("food_heal_bonus", 0.0)
 	health_regen_per_minute = data.get("health_regen_per_minute", 0.0)
+	better_chair_level = data.get("better_chair_level", 0)
+	better_table_level = data.get("better_table_level", 0)
+	better_bed_level = data.get("better_bed_level", 0)
 	is_blacked_out = data.get("is_blacked_out", false)
