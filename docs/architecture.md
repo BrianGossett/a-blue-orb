@@ -177,8 +177,8 @@ Pulled directly from the design doc's tables so this doc doubles as the live bal
 | Gain Confidence 4 | 100 mana | +10 orb mana gain, +5 HP cost |
 | A Better Meal | 10 mana, ×2/upgrade | +5 HP restore per level; gated on matching table tier |
 | A Better Chair | 2 familiars, ×2/upgrade (×4 max) | +1 HP regen/min, +1 orb mana gain per level |
-| A Better Table | 4 familiars, ×2/upgrade | +2 HP from food, +2 orb mana gain per level |
-| A Better Bed | 8 familiars, ×2/upgrade | (effect TBD in source doc) |
+| A Better Table | 4 familiars, ×2/upgrade (×4 max) | +2 HP from food, +2 orb mana gain per level |
+| A Better Bed | 8 familiars, ×2/upgrade (×4 max) | +20 max HP, +3 orb mana gain per level |
 
 ### Table → Food progression
 Rickety Table/Bread → Plain Table/Soup → Sturdy Table/Stew → Fine Table/Roast → Handsome Table/Shepherd's Pie.
