@@ -24,6 +24,7 @@ func set_area_data(new_data: AreaData) -> void:
 
 
 func _apply_area_data() -> void:
+	_furniture_fragments.clear()
 	_description_label.text = area_data.base_description
 	_update_tab_title()
 	_load_buttons()
@@ -53,6 +54,10 @@ func _load_buttons() -> void:
 		button_datas.append(load(dir_path + file_name))
 	button_datas.sort_custom(func(a: ButtonData, b: ButtonData) -> bool: return a.sort_order < b.sort_order)
 	for button_data in button_datas:
+		if button_data.one_shot and GameState.has_upgrade(button_data.id):
+			if button_data.room_description_fragment != "":
+				_furniture_fragments.append(button_data.room_description_fragment)
+			continue
 		var instance: Button = BUTTON_ACTION_SCENE.instantiate()
 		instance.set_data(button_data)
 		instance.one_shot_purchased.connect(_on_one_shot_purchased)
@@ -60,6 +65,7 @@ func _load_buttons() -> void:
 			_column_actions.add_child(instance)
 		else:
 			_column_upgrades.add_child(instance)
+	_rebuild_description()
 
 
 func _on_one_shot_purchased(purchased_data: ButtonData) -> void:
