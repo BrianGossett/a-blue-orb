@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/area_tab.tscn" id="2"]
+[ext_resource type="Resource" path="res://data/areas/house.tres" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/ui/log_panel.tscn" id="4"]
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Root" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Tabs" type="TabContainer" parent="Root"]
+size_flags_vertical = 3
+script = ExtResource("1")
+
+[node name="AreaTab" parent="Root/Tabs" instance=ExtResource("2")]
+area_data = ExtResource("3")
+
+[node name="Ritual Site" type="Control" parent="Root/Tabs"]
+
+[node name="LogPanel" parent="Root" instance=ExtResource("4")]
+custom_minimum_size = Vector2(0, 150)
