@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/button_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "confidence_3"
+labels = Array[String](["Gain confidence 3"])
+cost_type = "mana"
+base_cost = 50.0
+cost_scaling = "fixed"
+cost_step = 0.0
+cooldown_sec = 0.0
+unlock_condition = "confidence_tier >= 2"
+effect_id = "gain_confidence"
+flavor_lines = Array[String]([])
+one_shot = true
+button_column = 2
+sort_order = 3
+tier_source = ""
+cost_count_source = ""
+room_description_fragment = ""

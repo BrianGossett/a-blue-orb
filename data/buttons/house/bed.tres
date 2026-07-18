@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/button_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bed"
+labels = Array[String](["Somewhere to Rest"])
+cost_type = "familiars"
+base_cost = 4.0
+cost_scaling = "fixed"
+cost_step = 0.0
+cooldown_sec = 0.0
+unlock_condition = "familiars >= 5"
+effect_id = "add_bed"
+flavor_lines = Array[String]([])
+one_shot = true
+button_column = 1
+sort_order = 6
+tier_source = ""
+cost_count_source = ""
+room_description_fragment = "a bed"

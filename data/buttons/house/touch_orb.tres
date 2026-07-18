@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/button_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "touch_orb"
+labels = Array[String](["Gingerly touch the orb", "Carefully touch the orb", "Place your hand on the orb", "Place both hands on the orb", "Hold the orb for a moment"])
+cost_type = "none"
+base_cost = 0.0
+cost_scaling = "fixed"
+cost_step = 0.0
+cooldown_sec = 1.0
+unlock_condition = ""
+effect_id = "touch_orb"
+flavor_lines = Array[String]([])
+one_shot = false
+button_column = 1
+sort_order = 1
+tier_source = "confidence_tier"
+cost_count_source = ""
+room_description_fragment = ""

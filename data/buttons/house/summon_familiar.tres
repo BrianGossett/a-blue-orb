@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/button_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "summon_familiar"
+labels = Array[String](["Make Something", "Summon Familiar"])
+cost_type = "mana"
+base_cost = 1.0
+cost_scaling = "linear"
+cost_step = 1.0
+cooldown_sec = 0.0
+unlock_condition = ""
+effect_id = "summon_familiar"
+flavor_lines = Array[String]([])
+one_shot = false
+button_column = 1
+sort_order = 2
+tier_source = ""
+cost_count_source = "familiars"
+room_description_fragment = ""

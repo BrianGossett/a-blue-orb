@@ -1,0 +1,22 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://data/button_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "table"
+labels = Array[String](["Something to Eat On"])
+cost_type = "familiars"
+base_cost = 2.0
+cost_scaling = "fixed"
+cost_step = 0.0
+cooldown_sec = 0.0
+unlock_condition = "food_eaten_count >= 5 && familiars >= 3"
+effect_id = "add_table"
+flavor_lines = Array[String]([])
+one_shot = true
+button_column = 1
+sort_order = 5
+tier_source = ""
+cost_count_source = ""
+room_description_fragment = "a table"
