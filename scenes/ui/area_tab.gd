@@ -44,10 +44,13 @@ func _load_buttons() -> void:
 	var dir := DirAccess.open(dir_path)
 	if dir == null:
 		return
+	var button_datas: Array[ButtonData] = []
 	for file_name in dir.get_files():
 		if not file_name.ends_with(".tres"):
 			continue
-		var button_data: ButtonData = load(dir_path + file_name)
+		button_datas.append(load(dir_path + file_name))
+	button_datas.sort_custom(func(a: ButtonData, b: ButtonData) -> bool: return a.sort_order < b.sort_order)
+	for button_data in button_datas:
 		var instance: Button = BUTTON_ACTION_SCENE.instantiate()
 		instance.set_data(button_data)
 		if button_data.button_column == 1:

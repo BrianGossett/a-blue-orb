@@ -13,6 +13,7 @@ extends Resource
 @export var flavor_lines: Array[String]
 @export var one_shot: bool
 @export var button_column: int
+@export var sort_order: int
 
 
 static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int) -> float:
