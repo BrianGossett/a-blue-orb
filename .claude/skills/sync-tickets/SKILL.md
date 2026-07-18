@@ -26,7 +26,7 @@ Each ticket is a level-2 heading `## Ticket N — <Title>`. Tickets are separate
    (The `|| true` handles the label already existing — `gh label create` exits non-zero in that case, which is expected on re-runs.)
 
 2. **Parse the file.** Split on `\n## Ticket ` to get one chunk per ticket. For each chunk, extract:
-   - `N` and `Title` from the heading line (`Ticket N — Title`)
+   - `N` and `Title` from the heading line (`Ticket N — Title`). Strip markdown formatting (backtick code spans, `*`/`_` emphasis) from `Title` before using it anywhere an issue title is needed — GitHub issue titles render as plain text, and the heading may contain inline code spans (e.g. `` `GameState` Autoload ``) that should read as plain words in the title. Leave the ticket body's own markdown untouched.
    - The full ticket body up to (not including) the next `---` line or end of file
 
 3. **For each ticket, check for an existing issue before creating one:**
