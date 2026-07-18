@@ -39,6 +39,24 @@ func load_game() -> bool:
 	return _apply_save_json(text)
 
 
+func export_save() -> void:
+	var json_text := _build_save_json()
+	if OS.has_feature("web"):
+		JavaScriptBridge.download_buffer(json_text.to_utf8_buffer(), "a-blue-orb-save.json", "application/json")
+	else:
+		var file := FileAccess.open("user://exported_save.json", FileAccess.WRITE)
+		if file == null:
+			push_error("SaveManager: failed to open export file for writing")
+			return
+		file.store_string(json_text)
+		file.close()
+		LogManager.push("save exported to %s" % ProjectSettings.globalize_path("user://exported_save.json"))
+
+
+func import_save(file_data: String) -> bool:
+	return _apply_save_json(file_data)
+
+
 func _build_save_json() -> String:
 	return JSON.stringify({
 		"save_version": Constants.SAVE_VERSION,
