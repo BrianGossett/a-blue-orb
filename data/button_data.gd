@@ -33,8 +33,8 @@ static func is_unlock_condition_met(condition: String) -> bool:
 		return true
 	if condition.begins_with("has_upgrade("):
 		var inner := condition.trim_prefix("has_upgrade(").trim_suffix(")")
-		var id := inner.trim_prefix("\"").trim_suffix("\"")
-		return GameState.has_upgrade(id)
+		var upgrade_id := inner.trim_prefix("\"").trim_suffix("\"")
+		return GameState.has_upgrade(upgrade_id)
 	if ">=" in condition:
 		var parts := condition.split(">=")
 		if parts.size() == 2:
