@@ -13,3 +13,7 @@ func push(text: String) -> void:
 	if _lines.size() > MAX_LINES:
 		_lines.pop_front()
 	line_added.emit(line)
+
+
+func get_lines() -> Array[String]:
+	return _lines.duplicate()
