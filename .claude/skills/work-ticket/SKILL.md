@@ -1,6 +1,6 @@
 ---
 name: work-ticket
-description: Use when the next open GitHub issue labeled 'ticket' needs to be implemented, committed, and closed. Picks the next ticket in build order and pushes a commit that closes its issue.
+description: Use when the next open GitHub issue labeled 'ticket' needs to be implemented, committed, and closed.
 ---
 
 # Work Ticket
