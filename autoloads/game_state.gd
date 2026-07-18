@@ -88,7 +88,7 @@ func from_dict(data: Dictionary) -> void:
 	health = data.get("health", 50.0)
 	max_health = data.get("max_health", 50.0)
 	familiars = data.get("familiars", 0)
-	resources = data.get("resources", {"stone": 0, "wood": 0, "water": 0, "crystals": 0})
+	resources = (data.get("resources", {"stone": 0, "wood": 0, "water": 0, "crystals": 0}) as Dictionary).duplicate()
 	confidence_tier = data.get("confidence_tier", 0)
 	house_tier = data.get("house_tier", 0)
 	purchased_upgrades.assign(data.get("purchased_upgrades", []))
