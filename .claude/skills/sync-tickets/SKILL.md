@@ -29,13 +29,13 @@ Each ticket is a level-2 heading `## Ticket N — <Title>`. Tickets are separate
    - `N` and `Title` from the heading line (`Ticket N — Title`). Strip markdown formatting (backtick code spans, `*`/`_` emphasis) from `Title` before using it anywhere an issue title is needed — GitHub issue titles render as plain text, and the heading may contain inline code spans (e.g. `` `GameState` Autoload ``) that should read as plain words in the title. Leave the ticket body's own markdown untouched.
    - The full ticket body up to (not including) the next `---` line or end of file
 
-3. **For each ticket, check for an existing issue before creating one:**
+3. **List existing issues once, then match locally.** Don't use `gh issue list --search`, which is served by GitHub's search index and can lag seconds-to-minutes behind issue creation — a re-run shortly after a previous sync (or a retry after a partial failure) can miss just-created issues and create duplicates. Instead:
 
    ```bash
-   gh issue list --label ticket --state all --search "in:title \"Ticket N —\"" --json number,title
+   gh issue list --label ticket --state all --json number,title --limit 200
    ```
 
-   If any result's title starts with `Ticket N —`, skip this ticket (already synced) and count it as skipped.
+   Run this once before the per-ticket loop. For each ticket, skip creating it if any result's title starts with `Ticket N —` (exact `N`, not a prefix match against other numbers) — count it as skipped.
 
 4. **Convert the body's acceptance criteria to a task list.** Within the ticket body, find the line `**Acceptance criteria:**` and every following `- ` bullet up to the next blank-line-terminated section or `---`. Rewrite each of those bullets from `- <text>` to `- [ ] <text>`. Leave every other line of the body untouched — this only touches the acceptance-criteria bullets, not code blocks or other bullet lists (e.g. file-tree listings) elsewhere in the ticket.
 
@@ -56,3 +56,4 @@ Each ticket is a level-2 heading `## Ticket N — <Title>`. Tickets are separate
 
 - Re-running after editing the tickets file is safe: unchanged tickets are skipped by title match, new tickets get created. This does NOT detect edits to an already-synced ticket's body — if a ticket's content changed after its issue was created, the issue won't be updated automatically. Flag this to the user if you notice a mismatch between the file and an existing issue's body.
 - This skill only creates issues. It never closes, edits, or comments on existing ones — that's `work-ticket`'s job.
+- `work-ticket` picks the next ticket by lowest open issue *number*, which only matches the tickets file's intended build order if tickets are appended to the file, never inserted in the middle. Inserting a ticket between existing ones (e.g. a new "Ticket 4.5") and syncing it later gives it a higher issue number than tickets that come after it in the file, so it would be worked out of order.
