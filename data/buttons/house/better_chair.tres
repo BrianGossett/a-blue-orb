@@ -19,6 +19,7 @@ button_column = 2
 sort_order = 5
 tier_source = ""
 cost_count_source = ""
+count_seed_source = "better_chair_level"
 room_description_fragment = ""
 max_purchases = 4
 cooldown_gate_condition = ""
