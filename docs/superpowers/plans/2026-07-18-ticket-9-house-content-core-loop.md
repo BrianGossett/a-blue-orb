@@ -10,7 +10,8 @@
 
 ## Global Constraints
 
-- No `godot`/`godot4` CLI binary — verification is manual trace, not executed tests. This ticket is the first one that's actually meant to be *played*, so the final report must be explicit that a real playthrough in the editor is the only way to truly confirm this works, more so than any prior ticket.
+- **A working Godot 4.7.1 binary exists on this machine** at `/home/brian/Public/Programming/Godot_v4.7.1-stable_linux.x86_64` (found mid-plan — it was one directory deeper than an earlier `find` search checked, so every prior ticket's "no Godot binary" verification note was based on an incomplete search, not an actual absence). From here on, verification is a REAL headless run (`--headless --quit` from the project root after an initial `--headless --import` to build the class-name cache), not manual trace. Two real bugs were already found and fixed this way before this plan's Task 8 was written: (1) `var x := min(...)`/`max(...)` infers `Variant` and is a hard parse error in this engine build — always give such locals an explicit type instead of `:=`. (2) A `.tres` file's `[gd_resource type="ClassName" ...]` header using a custom `class_name` directly fails to load via `ClassDB` in this build, even though the class compiles fine and `ClassName.new()` works from GDScript — the working, verified pattern is `[gd_resource type="Resource" ...]` with `script = ExtResource(...)` attaching the custom class. Every `.tres` template in this plan (Task 8) already uses the corrected header. A full headless run confirmed the entire project (Tickets 1-8's output plus this plan's Tasks 1-7) loads with zero errors before Task 8 was written — so this bug pair is now fully fixed, not a residual risk carried into this ticket.
+- This ticket is the first one that's actually meant to be *played*, so even with headless verification now possible, the final report must still be explicit that visual layout, actual clicking, and real gameplay feel need the user to open the editor — headless verification catches load/parse errors, not gameplay correctness or visual layout.
 - **Scope boundary (explicitly approved by the project owner):** Column 1 items 1-6 (touch_orb, summon_familiar, eat_bread, chair, table, bed) and Column 2 item 8 (confidence_1 through confidence_4) only. Orb Channeling (`orb_plinth.tres`), the four "Better X" upgrades, and Better Bed are OUT of scope — a separate GitHub issue tracks them, filed alongside this plan, not part of it.
 - **Pre-existing bug fix (found while designing this plan, not by an automated test):** `EffectHandler._effect_add_chair()` (Ticket 5) calls `GameState.spend_familiars(1)` itself. `button_action.gd._handle_click()` (Ticket 6) *already* deducts cost generically (via `_deduct_cost()`) before calling `EffectHandler.run_effect()`. Wiring `chair.tres` into a real scene for the first time would have silently charged 2 familiars instead of 1. Fix: remove the self-deduction from `_effect_add_chair()` — effect functions apply only the *gain* side of an effect; cost deduction is `button_action.gd`'s job, done exactly once, for every `cost_type`. None of the other four existing effect functions have this bug (checked each one individually) — this fix and this constraint both apply to the two new effect functions this plan adds (`_effect_add_table`, `_effect_add_bed`) too.
 - **New `GameState` fields/methods** (extending the already-shipped Ticket 2 file, same precedent as Tickets 5 and 8 already established):
@@ -717,7 +718,7 @@ listener until now. Produces the exact mockup phrasing for 1, 2, and
 
 Every file uses this exact header/footer pattern (matching `data/areas/house.tres`'s established convention from Ticket 8, adapted for `ButtonData`):
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -729,7 +730,7 @@ script = ExtResource("1")
 - [ ] **Step 1: `data/buttons/house/touch_orb.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -756,7 +757,7 @@ room_description_fragment = ""
 - [ ] **Step 2: `data/buttons/house/summon_familiar.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -783,7 +784,7 @@ room_description_fragment = ""
 - [ ] **Step 3: `data/buttons/house/eat_bread.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -810,7 +811,7 @@ room_description_fragment = ""
 - [ ] **Step 4: `data/buttons/house/chair.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -837,7 +838,7 @@ room_description_fragment = "a chair"
 - [ ] **Step 5: `data/buttons/house/table.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -864,7 +865,7 @@ room_description_fragment = "a table"
 - [ ] **Step 6: `data/buttons/house/bed.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -891,7 +892,7 @@ room_description_fragment = "a bed"
 - [ ] **Step 7: `data/buttons/house/confidence_1.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -918,7 +919,7 @@ room_description_fragment = ""
 - [ ] **Step 8: `data/buttons/house/confidence_2.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -945,7 +946,7 @@ room_description_fragment = ""
 - [ ] **Step 9: `data/buttons/house/confidence_3.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -972,7 +973,7 @@ room_description_fragment = ""
 - [ ] **Step 10: `data/buttons/house/confidence_4.tres`**
 
 ```
-[gd_resource type="ButtonData" load_steps=2 format=3]
+[gd_resource type="Resource" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://data/button_data.gd" id="1"]
 
@@ -1001,11 +1002,14 @@ room_description_fragment = ""
 Run: `ls data/buttons/house/*.tres | wc -l`
 Expected: `10`
 
-Run: `grep -L 'type="ButtonData"' data/buttons/house/*.tres`
-Expected: no output (every file has the correct header).
+Run: `grep -L 'type="Resource"' data/buttons/house/*.tres`
+Expected: no output (every file has the correct header — the generic `Resource` type, per the header-mismatch bug found and fixed earlier in this plan, NOT `type="ButtonData"`).
 
 Run: `for f in data/buttons/house/*.tres; do echo "== $f =="; grep -E '^(id|effect_id|button_column|sort_order|unlock_condition) = ' "$f"; done`
 Expected: spot-check each file's `id` matches its filename, every `effect_id` matches one of the seven dispatched in Task 6 (`touch_orb`, `summon_familiar`, `eat_food`, `gain_confidence`, `add_chair`, `add_table`, `add_bed`), `sort_order` is unique within each `button_column`, and every `unlock_condition` matches what's documented above.
+
+Run (now that a real Godot binary exists — see Global Constraints): `/home/brian/Public/Programming/Godot_v4.7.1-stable_linux.x86_64 --headless --quit` from the project root.
+Expected: no `ERROR:`/`SCRIPT ERROR:` lines — confirms every new `.tres` actually loads, not just that its text looks right.
 
 - [ ] **Step 12: Commit**
 
@@ -1085,7 +1089,7 @@ Expected: Tickets 10, 11, 12, plus the new follow-up issue filed in Step 3.
 
 - [ ] **Step 6: Report to the user**
 
-This is the point where a real editor playthrough matters most of anything built so far. State plainly: nothing in this ticket has been executed — the trace in Step 1 is careful manual reasoning, not a test run, and a scene/resource file typo anywhere in the ten new `.tres` files or the seven modified/created scripts could break the whole chain in a way only the editor's console would reveal. Ask the user to: open the project, press Play, and actually click through the fresh-save playthrough traced in Step 1 — touch the orb a few times, summon a familiar, eat until Chair unlocks, keep going through Table, Bed, and all four Confidence tiers. Confirm the room description updates as furniture is bought, the touch-the-orb label progresses with Confidence, and nothing throws a console error. Also mention: a new follow-up issue now exists for Orb Channeling / Better X upgrades / Better Bed, and Ticket 10 (Health Depletion / Blackout Recovery) is next after that if they want to keep going in ticket order — or the follow-up issue, if they'd rather finish out the House tab's stretch content first.
+This is the point where a real editor playthrough matters most of anything built so far. State plainly: the project now loads cleanly under real headless execution (Task 8 Step 11's Godot run, zero errors) — that confirms every file parses and every resource resolves, but it does NOT confirm gameplay correctness, balance, or visual layout, none of which a headless `--quit` run exercises. The trace in Step 1 is careful manual reasoning about game logic, not a played session. Ask the user to: open the project, press Play, and actually click through the fresh-save playthrough traced in Step 1 — touch the orb a few times, summon a familiar, eat until Chair unlocks, keep going through Table, Bed, and all four Confidence tiers. Confirm the room description updates as furniture is bought, the touch-the-orb label progresses with Confidence, and nothing throws a console error. Also mention: a new follow-up issue now exists for Orb Channeling / Better X upgrades / Better Bed, and Ticket 10 (Health Depletion / Blackout Recovery) is next after that if they want to keep going in ticket order — or the follow-up issue, if they'd rather finish out the House tab's stretch content first.
 
 ---
 
