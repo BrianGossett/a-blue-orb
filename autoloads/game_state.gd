@@ -23,6 +23,8 @@ var health_regen_per_minute: float = 0.0
 var better_chair_level: int = 0
 var better_table_level: int = 0
 var better_bed_level: int = 0
+var familiars_assigned_to_orb: int = 0
+var better_meal_level: int = 0
 
 
 func add_mana(amount: float) -> void:
@@ -58,7 +60,7 @@ func add_familiars(n: int) -> void:
 
 
 func spend_familiars(n: int) -> bool:
-	if familiars < n:
+	if idle_familiars() < n:
 		return false
 	familiars -= n
 	EventBus.familiar_gained.emit(familiars)
@@ -130,6 +132,30 @@ func advance_better_bed_level() -> void:
 	better_bed_level = min(better_bed_level + 1, 4)
 
 
+func idle_familiars() -> int:
+	return familiars - familiars_assigned_to_orb
+
+
+func assign_familiar_to_orb() -> bool:
+	if idle_familiars() <= 0:
+		return false
+	familiars_assigned_to_orb += 1
+	add_orb_mana_per_second(1.0)
+	return true
+
+
+func unassign_familiar_from_orb() -> bool:
+	if familiars_assigned_to_orb <= 0:
+		return false
+	familiars_assigned_to_orb -= 1
+	add_orb_mana_per_second(-1.0)
+	return true
+
+
+func advance_better_meal_level() -> void:
+	better_meal_level = min(better_meal_level + 1, 4)
+
+
 func to_dict() -> Dictionary:
 	return {
 		"mana": mana,
@@ -150,6 +176,8 @@ func to_dict() -> Dictionary:
 		"better_table_level": better_table_level,
 		"better_bed_level": better_bed_level,
 		"is_blacked_out": is_blacked_out,
+		"familiars_assigned_to_orb": familiars_assigned_to_orb,
+		"better_meal_level": better_meal_level,
 	}
 
 
@@ -171,4 +199,6 @@ func from_dict(data: Dictionary) -> void:
 	better_chair_level = data.get("better_chair_level", 0)
 	better_table_level = data.get("better_table_level", 0)
 	better_bed_level = data.get("better_bed_level", 0)
+	familiars_assigned_to_orb = data.get("familiars_assigned_to_orb", 0)
+	better_meal_level = data.get("better_meal_level", 0)
 	is_blacked_out = false
