@@ -28,24 +28,21 @@ func test_one_shot_purchase_does_not_double_fire() -> void:
 	# purpose, to isolate whatever protection the button's own hidden/
 	# one-shot state provides against a second effect firing.
 	#
-	# KNOWN FAILING, DOCUMENTS A REAL GAP (not a test bug): Ticket 6's own
-	# acceptance criterion is "A one_shot button ... disappears after
-	# purchase and its cost is deducted exactly once — no double-fire on
-	# rapid clicks" (docs/tickets.md). Reading scenes/ui/button_action.gd's
-	# _handle_click() top to bottom, there is no internal check of
-	# `visible`, `_purchase_count`, or any "already purchased" flag — hide()
-	# only sets the Control's visible property. The only thing that actually
-	# stops a real double-click in production is Godot's own input system
-	# refusing to deliver further "pressed" signals to a hidden Button; nothing
-	# in button_action.gd's own logic enforces the acceptance criterion. A
+	# FORMERLY FAILING, NOW FIXED: this test originally caught a real gap —
+	# Ticket 6's acceptance criterion is "A one_shot button ... disappears
+	# after purchase and its cost is deducted exactly once — no double-fire
+	# on rapid clicks" (docs/tickets.md), but _handle_click() had no internal
+	# check of `visible`/`_purchase_count`/an "already purchased" flag;
+	# hide() only set the Control's visible property, and the only thing
+	# actually stopping a real double-click in production was Godot's own
+	# input system refusing to deliver further "pressed" signals to a
+	# hidden Button — not anything button_action.gd itself enforced. A
 	# second direct call to _handle_click() (bypassing that engine-level
-	# gate, exactly as instructed for this test) re-runs the full purchase
-	# path and fires the effect again. This assertion is written against the
-	# ticket's documented, intended behavior and is expected to fail against
-	# the current implementation until button_action.gd gains its own
-	# explicit guard (e.g. `if not visible: return` at the top of
-	# _handle_click()). See task-5-report.md for the full writeup; not fixed
-	# here per this task's backfill-testing-only scope.
+	# gate, exactly as this test does) used to re-run the full purchase path
+	# and fire the effect again. Fixed by adding `if not visible: return` at
+	# the top of _handle_click() so the guarantee is enforced by the script,
+	# not by an external actor's dispatch behavior. See task-5-report.md for
+	# the original finding.
 	button._handle_click()
 	button._handle_click()
 
