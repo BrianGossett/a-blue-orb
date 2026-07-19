@@ -1,9 +1,9 @@
-extends Control
+extends HBoxContainer
 
-@onready var _count_label: Label = $Root/CountLabel
-@onready var _info_label: Label = $Root/InfoLabel
-@onready var _up_button: Button = $Root/UpButton
-@onready var _down_button: Button = $Root/DownButton
+@onready var _count_label: Label = $CountLabel
+@onready var _info_label: Label = $InfoLabel
+@onready var _up_button: Button = $UpButton
+@onready var _down_button: Button = $DownButton
 
 
 func _ready() -> void:
