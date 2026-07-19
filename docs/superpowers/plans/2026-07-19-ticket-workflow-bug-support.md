@@ -17,7 +17,11 @@
 - GDScript: never `var x := min(...)` / `max(...)` — Variant-inference parse error in this engine build. Always `var x: float = min(...)`.
 - **Godot binary resolution order** (used by Task 2's setup and Task 11's `work-ticket` edit — both must state this order so each skill file is self-contained): (a) `command -v godot4` / `command -v godot` on PATH, (b) `$GODOT_BIN` env var, (c) a path saved in `.claude/godot-binary-path.txt` (gitignored — machine-specific, never commit it), (d) ask the user once for the path and save it to that file. On this machine today, (a) and (b) both miss; the real binary is at `/home/brian/Public/Programming/Godot_v4.7.1-stable_linux.x86_64` — Task 2 writes this path directly to the cache file rather than asking, since the controller already knows it from this session.
 - GUT version: pin to tag `v9.7.1` when vendoring `addons/gut/` (latest stable GUT release, supports Godot 4.x).
-- Standard test-run command once GUT is installed: `<godot_bin> --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit`.
+- **Standard test-run command once GUT is installed** (as of Task 6b — see that task's note for why both additions are mandatory, not optional):
+  ```
+  <godot_bin> --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gpre_run_script=res://tests/hooks/pre_run_save_guard.gd -gpost_run_script=res://tests/hooks/post_run_save_guard.gd -gexit
+  ```
+  `-ginclude_subdirs` is required because `-gdir` alone does not recurse (confirmed in Task 3 — without it, everything outside `tests/unit/`'s top level is silently skipped). `-gpre_run_script`/`-gpost_run_script` back up and restore the real `user://save.json` around every suite run — required because `autoloads/save_manager.gd` is a live autoload that autosaves on `EventBus.upgrade_purchased`/`familiar_gained`, so *any* test anywhere in the suite that mutates the live `GameState`/`EventBus` singletons (most of `tests/unit/ui/test_button_action.gd` and `tests/unit/autoloads/test_effect_handler*.gd`, not just save-specific tests) silently overwrites the developer's real save file as a side effect. Confirmed reproducible and already happened at least once during this plan's own execution before Task 6b caught it.
 - `docs/tickets.md` ticket/bug numbering is **one shared, interleaved sequence** (`## Ticket N —` and `## Bug N —` both count) — never two separate counters. Parse `N` as a leading integer plus an optional letter suffix (e.g. `9`, `9b`, `9c`) and sort/max by `(integer, suffix)` — plain string sort puts `"10"` before `"9b"`, which is wrong.
 - `docs/design_doc.md` is a manually-synced Google Doc export — never edit it directly; flag proposed changes to the user as "update the Google Doc: ...".
 - GUT tests cover **logic only** (state mutation, signal emission, calculation, unlock conditions) — never visual/layout/feel. `work-ticket`'s editor-check pause still exists for that; GUT shrinks what's left in that pause, it doesn't replace it.
@@ -618,10 +622,10 @@ The source spec's Piece 2 backfill only covered Tickets 1–9. The user asked, m
   >
   > Resolve the Godot binary path, in this order, stopping at the first hit: (a) `command -v godot4` / `command -v godot` on PATH, (b) `$GODOT_BIN` env var, (c) `.claude/godot-binary-path.txt` (gitignored — if it doesn't exist yet, ask the user once for the path and save it there so no future run has to ask again), (d) if none of the above resolve, ask.
   >
-  > Run the full suite:
+  > Run the full suite, using the exact standard command from Global Constraints (the `-gpre_run_script`/`-gpost_run_script` flags are mandatory, not optional — they protect the real `user://save.json` from being silently overwritten by any test that mutates the live `GameState`/`EventBus` singletons, per Task 6b's finding):
   > ```bash
   > BIN=$(cat .claude/godot-binary-path.txt)   # or whichever of (a)/(b) resolved
-  > "$BIN" --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -gexit
+  > "$BIN" --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gpre_run_script=res://tests/hooks/pre_run_save_guard.gd -gpost_run_script=res://tests/hooks/post_run_save_guard.gd -gexit
   > ```
   >
   > **If any test fails: fix and rerun.** This is not a stop-and-ask situation — a failing test against the ticket's own acceptance criteria is a bug in the current diff, not an ambiguity. Only stop and ask if a reasonable attempt to fix it fails, or the failure reveals the acceptance criteria themselves are contradictory or wrong.
