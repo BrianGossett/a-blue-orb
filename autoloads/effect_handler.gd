@@ -26,6 +26,8 @@ func run_effect(effect_id: String) -> bool:
 			return _effect_better_table()
 		"better_bed":
 			return _effect_better_bed()
+		"better_meal":
+			return _effect_better_meal()
 		_:
 			push_error("EffectHandler: unknown effect_id \"%s\"" % effect_id)
 			return false
@@ -119,4 +121,14 @@ func _effect_better_bed() -> bool:
 	GameState.add_orb_mana_per_click(3.0)
 	GameState.advance_better_bed_level()
 	LogManager.push("your bed looks even more inviting.")
+	return true
+
+
+func _effect_better_meal() -> bool:
+	if GameState.better_meal_level >= GameState.better_table_level:
+		push_error("EffectHandler: better_meal_level cannot exceed better_table_level")
+		return false
+	GameState.add_food_heal_bonus(5.0)
+	GameState.advance_better_meal_level()
+	LogManager.push("the meal tastes a little better.")
 	return true
