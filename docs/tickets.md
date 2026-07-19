@@ -410,3 +410,35 @@ Split off from Ticket 9b (issue #13) — both items here need a real design/arch
 - Confirm the log panel format exactly matches the mockup: `[HH:MM:SS] you gingerly touch the orb.` (lowercase after the timestamp, matching the mock's tone — flag if this was built differently and needs a fix).
 - Flag anything discovered during build that should update `docs/architecture.md` (per that doc's own workflow note in §8) — don't let the doc silently go stale.
 
+
+---
+
+## Ticket 13 — [DEMO — placeholder, will be removed after the walkthrough] Ambient Room Sound Toggle
+**Status:** Not yet synced
+
+**Description:** DEMO CONTENT for Task 12's dry-run walkthrough only. A mute/unmute toggle for the House tab's ambient audio loop, placed near the log panel.
+
+**Context/constraints:** Placeholder — in a real invocation, `make-ticket` would have asked which scene this belongs to, whether ambient audio exists yet at all, and confirmed the toggle's default state against `docs/design_doc.md` before writing this.
+
+**Files/scenes likely touched:** `scenes/ui/area_tab.tscn` (placeholder guess only, not verified).
+
+**Acceptance criteria:**
+- [ ] DEMO — not a real requirement.
+
+---
+
+## Bug 14 — [DEMO — placeholder, will be removed after the walkthrough] Log panel scrollbar doesn't stick to bottom
+**Status:** Not yet synced
+
+**Description:** DEMO CONTENT for Task 12's dry-run walkthrough only. Placeholder repro of a hypothetical UI bug.
+
+**Repro steps:** Push more than a screen's worth of log lines; the log panel doesn't auto-scroll to the newest line.
+
+**Expected vs. Actual:** Expected: view stays pinned to the newest line. Actual (hypothetical, for demo purposes): view stays wherever it was.
+
+**Root cause hypothesis:** `scenes/ui/log_panel.gd` likely doesn't call `scroll_to_line()` (or equivalent) on `line_added`.
+
+**Affected files/scenes:** `scenes/ui/log_panel.gd`, `scenes/ui/log_panel.tscn`.
+
+**Acceptance criteria:**
+- [ ] DEMO — not a real requirement.
