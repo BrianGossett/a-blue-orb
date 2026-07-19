@@ -40,7 +40,7 @@ func test_buttons_are_loaded_in_ascending_sort_order_per_column() -> void:
 	# Ticket 9's flagged gap from Ticket 8's review: _load_buttons() sorts
 	# by ButtonData.sort_order before appending, independent of filesystem
 	# enumeration order. Use the real shipped house AreaData/ButtonData
-	# files (14 of them) to prove the comparator is wired in.
+	# files (11 of them) to prove the comparator is wired in.
 	var tab = add_child_autofree(load("res://scenes/ui/area_tab.tscn").instantiate())
 	var house_data: AreaData = load("res://data/areas/house.tres")
 

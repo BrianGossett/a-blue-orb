@@ -4,19 +4,23 @@
 
 [resource]
 script = ExtResource("1")
-id = "confidence_4"
-labels = Array[String](["Gain confidence 4"])
+id = "confidence"
+labels = Array[String](["Gain Confidence"])
 cost_type = "mana"
-base_cost = 100.0
-cost_scaling = "fixed"
+base_cost = 10.0
+cost_scaling = "table"
 cost_step = 0.0
 cooldown_sec = 0.0
-unlock_condition = "confidence_tier >= 3"
+unlock_condition = ""
 effect_id = "gain_confidence"
 flavor_lines = Array[String]([])
-one_shot = true
+one_shot = false
 button_column = 2
-sort_order = 4
+sort_order = 1
 tier_source = ""
 cost_count_source = ""
+count_seed_source = "confidence_tier"
 room_description_fragment = ""
+max_purchases = 4
+cooldown_gate_condition = ""
+cost_table = Array[float]([10.0, 20.0, 50.0, 100.0])

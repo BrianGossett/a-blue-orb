@@ -28,6 +28,10 @@ func _seed_purchase_count() -> int:
 			return GameState.better_table_level
 		"better_bed_level":
 			return GameState.better_bed_level
+		"better_meal_level":
+			return GameState.better_meal_level
+		"confidence_tier":
+			return GameState.confidence_tier
 		_:
 			return 0
 

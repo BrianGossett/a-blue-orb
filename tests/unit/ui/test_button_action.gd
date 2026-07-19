@@ -160,3 +160,37 @@ func test_max_purchases_hides_the_button() -> void:
 	button._handle_click()
 
 	assert_false(button.visible, "reaching max_purchases should hide the button, same as one_shot")
+
+
+func test_confidence_tres_full_purchase_sequence() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data: ButtonData = load("res://data/buttons/house/confidence.tres")
+	button.set_data(data)
+
+	var expected_costs: Array[float] = [10.0, 20.0, 50.0, 100.0]
+	for i in range(4):
+		GameState.add_mana(expected_costs[i])
+		var mana_before: float = GameState.mana
+		button._handle_click()
+		assert_eq(mana_before - GameState.mana, expected_costs[i], "level %d should cost %s mana" % [i, expected_costs[i]])
+
+	assert_eq(GameState.confidence_tier, 4, "4 purchases should max out confidence_tier")
+	assert_false(button.visible, "button should hide once max_purchases (4) is reached")
+
+
+func test_confidence_tres_seeds_purchase_count_on_reload() -> void:
+	GameState.confidence_tier = 2
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data: ButtonData = load("res://data/buttons/house/confidence.tres")
+	button.set_data(data)
+
+	# Regression check for the _seed_purchase_count() gap fixed in this same
+	# task: before the fix, "confidence_tier" wasn't a recognized
+	# count_seed_source, so a reloaded save's confidence_tier=2 would be
+	# silently ignored and this button would re-seed at 0 (tier-0 cost,
+	# 10 mana) instead of correctly resuming at tier 2 (50 mana).
+	GameState.add_mana(50.0)
+	var mana_before: float = GameState.mana
+	button._handle_click()
+	assert_eq(mana_before - GameState.mana, 50.0, "should resume at tier-2 cost (50 mana), not reset to tier-0 cost (10 mana)")
+	assert_eq(GameState.confidence_tier, 3)
