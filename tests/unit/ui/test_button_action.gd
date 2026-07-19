@@ -194,3 +194,49 @@ func test_confidence_tres_seeds_purchase_count_on_reload() -> void:
 	button._handle_click()
 	assert_eq(mana_before - GameState.mana, 50.0, "should resume at tier-2 cost (50 mana), not reset to tier-0 cost (10 mana)")
 	assert_eq(GameState.confidence_tier, 3)
+
+
+func test_cooldown_bar_hidden_until_a_cooldown_actually_starts() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data := ButtonData.new()
+	data.cost_type = "none"
+	data.cooldown_sec = 5.0
+	data.effect_id = "summon_familiar"
+	data.labels = ["Test"]
+	button.set_data(data)
+
+	assert_false(button._cooldown_bar.visible, "no cooldown has started yet")
+
+
+func test_cooldown_bar_fills_as_the_cooldown_counts_down() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data := ButtonData.new()
+	data.cost_type = "none"
+	data.cooldown_sec = 10.0
+	data.effect_id = "summon_familiar"
+	data.labels = ["Test"]
+	button.set_data(data)
+
+	button._handle_click()
+	assert_true(button._cooldown_bar.visible, "cooldown just started")
+	assert_eq(button._cooldown_bar.value, 0.0, "freshly started cooldown should read empty")
+
+	button._process(5.0)  # half of cooldown_sec
+	assert_eq(button._cooldown_bar.value, 0.5, "halfway through a 10s cooldown after 5s")
+
+	button._process(5.0)  # the remaining half
+	assert_false(button._is_on_cooldown, "cooldown should be over")
+	assert_false(button._cooldown_bar.visible, "bar should hide once the cooldown ends")
+
+
+func test_cooldown_bar_never_shows_for_buttons_with_no_cooldown() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data := ButtonData.new()
+	data.cost_type = "none"
+	data.cooldown_sec = 0.0
+	data.effect_id = "summon_familiar"
+	data.labels = ["Test"]
+	button.set_data(data)
+
+	button._handle_click()
+	assert_false(button._cooldown_bar.visible, "no cooldown_sec means no cooldown, so no bar ever")

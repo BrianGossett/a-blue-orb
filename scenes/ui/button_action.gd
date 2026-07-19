@@ -9,6 +9,8 @@ var _is_processing_click: bool = false
 var _is_blacked_out: bool = false
 var _cooldown_remaining: float = 0.0
 
+@onready var _cooldown_bar: ProgressBar = $CooldownBar
+
 
 func set_data(new_data: ButtonData) -> void:
 	data = new_data
@@ -198,6 +200,8 @@ func _start_cooldown() -> void:
 	_is_on_cooldown = true
 	_cooldown_remaining = data.cooldown_sec
 	disabled = true
+	_cooldown_bar.value = 0.0
+	_cooldown_bar.visible = true
 
 
 func _process(delta: float) -> void:
@@ -206,6 +210,8 @@ func _process(delta: float) -> void:
 	if data.cooldown_gate_condition != "" and not ButtonData.is_unlock_condition_met(data.cooldown_gate_condition):
 		return
 	_cooldown_remaining -= delta
+	_cooldown_bar.value = clampf(1.0 - (_cooldown_remaining / data.cooldown_sec), 0.0, 1.0)
 	if _cooldown_remaining <= 0.0:
 		_is_on_cooldown = false
+		_cooldown_bar.visible = false
 		_refresh()
