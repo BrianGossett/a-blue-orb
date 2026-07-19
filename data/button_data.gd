@@ -50,11 +50,19 @@ static func is_unlock_condition_met(condition: String) -> bool:
 	if ">=" in condition:
 		var parts := condition.split(">=")
 		if parts.size() == 2:
-			var stat_name := parts[0].strip_edges()
-			var threshold := parts[1].strip_edges().to_float()
-			return _get_stat_value(stat_name) >= threshold
+			return _resolve_operand(parts[0].strip_edges()) >= _resolve_operand(parts[1].strip_edges())
+	if "<" in condition:
+		var parts := condition.split("<")
+		if parts.size() == 2:
+			return _resolve_operand(parts[0].strip_edges()) < _resolve_operand(parts[1].strip_edges())
 	push_error("ButtonData: unrecognized unlock_condition shape \"%s\"" % condition)
 	return false
+
+
+static func _resolve_operand(token: String) -> float:
+	if token.is_valid_float():
+		return token.to_float()
+	return _get_stat_value(token)
 
 
 static func _get_stat_value(stat_name: String) -> float:
@@ -69,6 +77,14 @@ static func _get_stat_value(stat_name: String) -> float:
 			return float(GameState.house_tier)
 		"food_eaten_count":
 			return float(GameState.food_eaten_count)
+		"better_chair_level":
+			return float(GameState.better_chair_level)
+		"better_table_level":
+			return float(GameState.better_table_level)
+		"better_bed_level":
+			return float(GameState.better_bed_level)
+		"better_meal_level":
+			return float(GameState.better_meal_level)
 		_:
 			push_error("ButtonData: unknown stat \"%s\" in unlock_condition" % stat_name)
 			return -INF
