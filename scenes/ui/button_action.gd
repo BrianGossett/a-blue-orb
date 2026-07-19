@@ -120,7 +120,7 @@ func _can_afford() -> bool:
 		"mana":
 			return GameState.mana >= cost
 		"familiars":
-			return float(GameState.familiars) >= cost
+			return float(GameState.idle_familiars()) >= cost
 		_:
 			return true
 
