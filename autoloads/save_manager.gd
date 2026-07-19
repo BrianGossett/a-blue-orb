@@ -14,7 +14,7 @@ func _ready() -> void:
 	_autosave_timer.start()
 
 
-func _on_purchase() -> void:
+func _on_purchase(_arg = null) -> void:
 	save_game()
 
 
