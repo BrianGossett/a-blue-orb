@@ -1,6 +1,6 @@
 ---
 name: sync-tickets
-description: Use when a markdown tickets/backlog file needs to become GitHub issues, or when re-running after that file changed to pick up new or edited tickets without duplicating existing issues.
+description: Use when a markdown tickets/backlog file (feature tickets and bug tickets) needs to become GitHub issues, or when re-running after that file changed to pick up new or edited tickets without duplicating existing issues.
 ---
 
 # Sync Tickets
@@ -13,7 +13,7 @@ A path to a tickets markdown file. If not given, default to `docs/tickets.md`. O
 
 ## Ticket file format
 
-Each ticket is a level-2 heading `## Ticket N — <Title>`. Tickets are separated by a `---` horizontal rule. Each ticket's body may contain a `**Acceptance criteria:**` line followed by a bullet list (`- ...`) running until the next `---` or end of file.
+Each entry is a level-2 heading, either `## Ticket N — <Title>` (a feature ticket) or `## Bug N — <Title>` (a bug ticket) — both share one interleaved numbering sequence. Entries are separated by a `---` horizontal rule. Each entry's body may contain a `**Acceptance criteria:**` line followed by a bullet list (`- ...`) running until the next `---` or end of file.
 
 ## Procedure
 
