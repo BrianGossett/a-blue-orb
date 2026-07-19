@@ -366,6 +366,50 @@
 
 ---
 
+### Task 6b: GUT tests for Tickets 10, 11 (user-requested extension beyond the original Piece 2 scope)
+
+The source spec's Piece 2 backfill only covered Tickets 1–9. The user asked, mid-execution, to extend GUT coverage to Ticket 10 (blackout/recovery) and Ticket 11 (save system) too. This task follows the same conventions as Tasks 3–6.
+
+**Files:**
+- Create: `tests/unit/ui/test_blackout_overlay.gd`
+- Create: `tests/unit/autoloads/test_save_manager.gd`
+
+**Interfaces:**
+- Consumes: `scenes/ui/blackout_overlay.gd`/`.tscn` (Ticket 10), `autoloads/save_manager.gd` (Ticket 11), `data/balancing/constants.gd`'s `BLACKOUT_RECOVERY_SEC` (5.0) / `SAVE_VERSION` (1) / `AUTOSAVE_INTERVAL_SEC` (20.0).
+
+**Task-specific constraint — real file I/O safety:** `SaveManager.save_game()`/`load_game()`/`import_save()` read and write the actual `user://save.json` path, which is the **same path a real played build uses on this machine**, not a test-isolated location. Any test that calls these methods must back up whatever's at `user://save.json` before running (if anything) and restore it exactly afterward (`before_each`/`after_each`, or `before_all`/`after_all` if GUT supports file-level setup — check `addons/gut/test.gd` for the exact hook names available), so running this test suite can never destroy real save data on this machine. Read the existing file's raw bytes/text (not just parsed JSON) so restoration is byte-exact.
+
+- [ ] **Step 1: `test_blackout_overlay.gd`** — instantiate the real scene via `add_child_autofree(load("res://scenes/ui/blackout_overlay.tscn").instantiate())`. `before_each()`: `GameState.from_dict({})`.
+
+  - Trigger via the real production path: fresh state (`health` 50), call `GameState.spend_health(50.0)` directly (this is what actually emits `EventBus.health_depleted` at exactly 0, which `blackout_overlay.gd`'s `_on_health_depleted()` listens for) → assert the overlay's `visible == true` and `GameState.is_blacked_out == true`.
+  - Re-entrancy guard: with the overlay already blacked out (from the step above), call `_on_health_depleted()` again directly → assert no error and no duplicate/restarted timer (the guard is `if GameState.is_blacked_out: return` at the top of the method — the second call should be a complete no-op; a reasonable proxy assertion is that `GameState.is_blacked_out` is still simply `true`, not toggled or re-entered).
+  - Recovery: with the overlay blacked out, call `_on_recovery_timeout()` directly (bypassing the real `Timer`'s wait) → assert `GameState.health` increased by exactly `1.0`, `GameState.is_blacked_out == false`, and `EventBus.blackout_ended` was emitted (`watch_signals(EventBus)` before the call).
+  - Full-blockage acceptance criterion (Ticket 10's own — re-asserted here in integration context, not just at the `GameState`-unit level Task 3 already covered): once blacked out (via `_on_health_depleted()`), call `GameState.spend_health(10.0)` → assert `GameState.health` unchanged at `0.0` (the guard genuinely blocks HP-spending, not just in isolation but through the same object graph the real game uses).
+  - `Constants.BLACKOUT_RECOVERY_SEC` is actually wired to the overlay's `Timer`: after instantiating the scene (which runs `_ready()`), assert the internal `Timer`'s `wait_time == Constants.BLACKOUT_RECOVERY_SEC` — reach it via `.get_node()`-style access if the `_timer` var isn't directly visible from the test script, or via a debugger-style property read if GUT exposes it; if truly unreachable without modifying `blackout_overlay.gd`, assert `Constants.BLACKOUT_RECOVERY_SEC == 5.0` alone and note in the report that the wiring itself wasn't independently re-verified beyond reading the source.
+
+- [ ] **Step 2: `test_save_manager.gd`**
+
+  `before_each()`: back up `user://save.json` (read its text if `FileAccess.file_exists("user://save.json")`, else note it didn't exist) and call `GameState.from_dict({})`. `after_each()`: restore the backed-up text (`FileAccess.open("user://save.json", FileAccess.WRITE)` + `store_string`), or delete the file via `DirAccess.remove_absolute(ProjectSettings.globalize_path("user://save.json"))` if it didn't exist before this test.
+
+  - **Real round trip through actual file I/O** (not just the in-memory `to_dict()`/`from_dict()` Task 3 already covered): on a reset `GameState`, call `add_mana(12.0)`, `add_familiars(3)`, `mark_upgrade_purchased("chair")`, `advance_confidence_tier()` twice. Call `SaveManager.save_game()`. Reset `GameState` again (`from_dict({})`, simulating a fresh session). Call `SaveManager.load_game()` → assert returns `true`, and assert `GameState.mana == 12.0`, `familiars == 3`, `has_upgrade("chair") == true`, `confidence_tier == 2` — the real file was written and re-read, not just the in-memory dict.
+  - **`save_version` present:** after `save_game()`, read `user://save.json` directly, `JSON.parse_string()` it, assert the top-level `"save_version"` key equals `Constants.SAVE_VERSION`.
+  - **Version-mismatch rejection (Ticket 11's own explicit acceptance criterion — "hand-edit a save's version field and attempt import"):** build a JSON string by hand with `"save_version": Constants.SAVE_VERSION + 999` and a plausible `"game_state"` payload; call `SaveManager.import_save(that_string)` → assert returns `false`; assert `GameState` is completely unchanged from whatever it was immediately before the call (no partial/corrupting mutation).
+  - **`is_blacked_out` never restored, through the real `SaveManager` path** (Ticket 11's own flagged soft-lock risk, already fixed at the `GameState.from_dict()` level per Task 3 — re-confirm the guarantee holds transitively through `SaveManager` too, since that's the actual call path a save/load in real play uses): `GameState.enter_blackout()`, `SaveManager.save_game()`, `GameState.from_dict({})` (reset), `SaveManager.load_game()` → assert `GameState.is_blacked_out == false`.
+  - **Better-X reload-seeding gap (Ticket 11's own flagged "second reload gap" — confirm it's actually fixed, not just that the raw field round-trips):** reset `GameState`, set `GameState.better_chair_level = 3` directly, `SaveManager.save_game()`, reset again, `SaveManager.load_game()` → assert the raw field round-trips (`GameState.better_chair_level == 3`). Then verify the UI-layer half: instantiate a real `button_action.tscn` (`add_child_autofree(...)`), build a `ButtonData` in-code with `count_seed_source = "better_chair_level"` (mirroring the three shipped `.tres` files that already use this field), call `set_data()` on the button → assert the button's seeded purchase count reflects level `3` (check via whatever's externally observable — e.g. the rendered label text matching `data.labels[3]` rather than `data.labels[0]`, since `_purchase_count` itself is private). This proves the reload-seeding path Ticket 11 flagged is wired end-to-end after a real load, not just that the `GameState` field persists.
+
+- [ ] **Step 3: Run the full suite, confirm green** (same command as prior tasks, with `-ginclude_subdirs`).
+
+- [ ] **Step 4: Report any real pre-existing bugs found, do not fix them** — same pattern as Tasks 3–6: flag clearly, let the controller decide whether to fix out-of-band.
+
+- [ ] **Step 5: Commit**
+
+  ```bash
+  git add tests/unit/ui/test_blackout_overlay.gd tests/unit/autoloads/test_save_manager.gd
+  git commit -m "Backfill GUT tests for Tickets 10/11 — blackout/recovery, SaveManager (user-requested scope extension)"
+  ```
+
+---
+
 ### Task 7: Default `sync-tickets` input to `docs/tickets.md` (Piece 3)
 
 **Files:**
