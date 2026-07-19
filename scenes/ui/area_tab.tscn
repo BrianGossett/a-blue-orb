@@ -25,16 +25,18 @@ anchor_bottom = 1.0
 [node name="StatBar" parent="Root" instance=ExtResource("2")]
 
 [node name="Content" type="HBoxContainer" parent="Root"]
-theme_override_constants/separation = 32
 
-[node name="ButtonGrid" type="HBoxContainer" parent="Root/Content"]
-theme_override_constants/separation = 32
+[node name="ColumnActions" type="VBoxContainer" parent="Root/Content"]
 
-[node name="ColumnActions" type="VBoxContainer" parent="Root/Content/ButtonGrid"]
+[node name="Spacer1" type="Control" parent="Root/Content"]
+size_flags_horizontal = 3
 
-[node name="ColumnUpgrades" type="VBoxContainer" parent="Root/Content/ButtonGrid"]
+[node name="ColumnUpgrades" type="VBoxContainer" parent="Root/Content"]
 
-[node name="OrbChanneling" parent="Root/Content/ButtonGrid/ColumnUpgrades" instance=ExtResource("3")]
+[node name="OrbChanneling" parent="Root/Content/ColumnUpgrades" instance=ExtResource("3")]
+
+[node name="Spacer2" type="Control" parent="Root/Content"]
+size_flags_horizontal = 3
 
 [node name="RoomInfo" type="VBoxContainer" parent="Root/Content"]
 

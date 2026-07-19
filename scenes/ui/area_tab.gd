@@ -4,8 +4,8 @@ extends Control
 
 const BUTTON_ACTION_SCENE := preload("res://scenes/ui/button_action.tscn")
 
-@onready var _column_actions: VBoxContainer = $Root/Content/ButtonGrid/ColumnActions
-@onready var _column_upgrades: VBoxContainer = $Root/Content/ButtonGrid/ColumnUpgrades
+@onready var _column_actions: VBoxContainer = $Root/Content/ColumnActions
+@onready var _column_upgrades: VBoxContainer = $Root/Content/ColumnUpgrades
 @onready var _description_label: RichTextLabel = $Root/Content/RoomInfo/Description
 
 var _furniture_fragments: Array[String] = []
