@@ -42,6 +42,7 @@ func _ready() -> void:
 	_connect_tier_source()
 	EventBus.health_depleted.connect(_on_health_depleted)
 	EventBus.blackout_ended.connect(_on_blackout_ended)
+	EventBus.state_changed.connect(_on_state_changed)
 	if data:
 		_refresh()
 
@@ -69,6 +70,10 @@ func _on_health_depleted() -> void:
 
 func _on_blackout_ended() -> void:
 	_is_blacked_out = false
+	_refresh()
+
+
+func _on_state_changed() -> void:
 	_refresh()
 
 

@@ -127,6 +127,26 @@ func test_refund_on_effect_failure() -> void:
 	assert_push_error("better_chair_level already at max")
 
 
+func test_unlock_condition_reevaluates_on_unrelated_state_change() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data := ButtonData.new()
+	data.id = "test_chair_like"
+	data.labels = ["Test"]
+	data.cost_type = "none"
+	data.unlock_condition = "food_eaten_count >= 2"
+	data.effect_id = "summon_familiar"
+	button.set_data(data)
+
+	assert_true(button.disabled, "Should start disabled — food_eaten_count is 0.")
+
+	# Mutate the stat directly — NOT through this button, NOT through Eat Bread's
+	# own button — simulating a different action satisfying this button's condition.
+	GameState.food_eaten_count = 2
+	EventBus.state_changed.emit()
+
+	assert_false(button.disabled, "Should re-evaluate and enable once food_eaten_count >= 2, without any other trigger.")
+
+
 func test_max_purchases_hides_the_button() -> void:
 	var button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
 	var data := ButtonData.new()

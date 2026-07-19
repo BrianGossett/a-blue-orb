@@ -23,9 +23,9 @@ New entries are appended at the end of this file, each preceded by a `---` horiz
 
 ## Bug 13 — Buttons don't refresh when an unrelated action makes their unlock_condition true
 **Found:** 2026-07-19
-**Status:** Open
+**Status:** Fixed
 **Description:** Buttons whose `unlock_condition` depends on a stat another button/action changes stay visually disabled even after the condition is satisfied — they only refresh if something unrelated (like a blackout) coincidentally triggers that button's own `_refresh()`.
 **Root cause (hypothesis):** `button_action.gd`'s `_ready()` only connects to `EventBus.health_depleted`/`blackout_ended` and, for `tier_source` buttons, `confidence_tier_changed`/`house_tier_changed` — there's no general mechanism re-evaluating `unlock_condition` when the specific stats it references change elsewhere.
-**Root cause (confirmed):**
-**Fix summary:**
+**Root cause (confirmed):** `scenes/ui/button_action.gd`'s `_ready()` only connected to `EventBus.health_depleted`/`blackout_ended` and, for `tier_source` buttons, `confidence_tier_changed`/`house_tier_changed` — there was no general mechanism re-evaluating `unlock_condition` when the specific stats it references changed via a *different* button's action. Matches the original hypothesis exactly; no surprises found during the fix.
+**Fix summary:** Added a generic, argument-less `EventBus.state_changed` signal, emitted from every public `GameState` mutator (`autoloads/event_bus.gd`, `autoloads/game_state.gd`). Every `button_action.gd` instance now connects to it unconditionally in `_ready()` and calls `_refresh()` on it (`scenes/ui/button_action.gd`), so any state change re-evaluates every live button's `unlock_condition`/afford/cooldown state, not just the ones already covered by blackout or `tier_source` signals.
 **Ticket:** Bug 13 in docs/tickets.md · GitHub issue: #17
