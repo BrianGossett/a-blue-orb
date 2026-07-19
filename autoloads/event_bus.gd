@@ -8,3 +8,4 @@ signal health_depleted
 signal blackout_ended
 signal house_tier_changed(new_tier: int)
 signal confidence_tier_changed(new_tier: int)
+signal state_changed

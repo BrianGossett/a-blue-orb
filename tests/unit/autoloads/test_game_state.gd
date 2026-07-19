@@ -126,3 +126,28 @@ func test_from_dict_duplicates_resources_dict() -> void:
 # a code-review/static invariant (about call-site discipline elsewhere in the
 # codebase), not an observable runtime behavior of GameState itself — there is
 # no GUT assertion that can verify it.
+
+
+func test_add_mana_emits_state_changed() -> void:
+	watch_signals(EventBus)
+	gs.add_mana(5.0)
+	assert_signal_emitted(EventBus, "state_changed")
+
+
+func test_advance_confidence_tier_emits_state_changed() -> void:
+	watch_signals(EventBus)
+	gs.advance_confidence_tier()
+	assert_signal_emitted(EventBus, "state_changed")
+
+
+func test_from_dict_emits_state_changed() -> void:
+	watch_signals(EventBus)
+	gs.from_dict({})
+	assert_signal_emitted(EventBus, "state_changed")
+
+
+func test_spend_mana_insufficient_does_not_emit_state_changed() -> void:
+	watch_signals(EventBus)
+	var result: bool = gs.spend_mana(1000.0)
+	assert_false(result)
+	assert_signal_not_emitted(EventBus, "state_changed")

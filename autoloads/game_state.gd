@@ -30,6 +30,7 @@ var better_meal_level: int = 0
 func add_mana(amount: float) -> void:
 	mana += amount
 	EventBus.mana_changed.emit(mana)
+	EventBus.state_changed.emit()
 
 
 func spend_mana(amount: float) -> bool:
@@ -37,12 +38,14 @@ func spend_mana(amount: float) -> bool:
 		return false
 	mana -= amount
 	EventBus.mana_changed.emit(mana)
+	EventBus.state_changed.emit()
 	return true
 
 
 func add_health(amount: float) -> void:
 	health = min(health + amount, max_health)
 	EventBus.health_changed.emit(health, max_health)
+	EventBus.state_changed.emit()
 
 
 func spend_health(amount: float) -> void:
@@ -50,6 +53,7 @@ func spend_health(amount: float) -> void:
 		return
 	health = max(health - amount, 0.0)
 	EventBus.health_changed.emit(health, max_health)
+	EventBus.state_changed.emit()
 	if health <= 0.0:
 		EventBus.health_depleted.emit()
 
@@ -57,6 +61,7 @@ func spend_health(amount: float) -> void:
 func add_familiars(n: int) -> void:
 	familiars += n
 	EventBus.familiar_gained.emit(familiars)
+	EventBus.state_changed.emit()
 
 
 func spend_familiars(n: int) -> bool:
@@ -64,6 +69,7 @@ func spend_familiars(n: int) -> bool:
 		return false
 	familiars -= n
 	EventBus.familiar_gained.emit(familiars)
+	EventBus.state_changed.emit()
 	return true
 
 
@@ -76,60 +82,74 @@ func mark_upgrade_purchased(id: String) -> void:
 		return
 	purchased_upgrades.append(id)
 	EventBus.upgrade_purchased.emit(id)
+	EventBus.state_changed.emit()
 
 
 func add_orb_mana_per_click(amount: float) -> void:
 	orb_mana_per_click += amount
+	EventBus.state_changed.emit()
 
 
 func add_orb_mana_per_second(amount: float) -> void:
 	orb_mana_per_second += amount
+	EventBus.state_changed.emit()
 
 
 func advance_confidence_tier() -> void:
 	confidence_tier = min(confidence_tier + 1, 4)
 	EventBus.confidence_tier_changed.emit(confidence_tier)
+	EventBus.state_changed.emit()
 
 
 func enter_blackout() -> void:
 	is_blacked_out = true
+	EventBus.state_changed.emit()
 
 
 func exit_blackout() -> void:
 	is_blacked_out = false
+	EventBus.state_changed.emit()
 
 
 func add_food_eaten() -> void:
 	food_eaten_count += 1
+	EventBus.state_changed.emit()
 
 
 func add_orb_health_cost_per_click(amount: float) -> void:
 	orb_health_cost_per_click += amount
+	EventBus.state_changed.emit()
 
 
 func add_food_heal_bonus(amount: float) -> void:
 	food_heal_bonus += amount
+	EventBus.state_changed.emit()
 
 
 func add_health_regen_per_minute(amount: float) -> void:
 	health_regen_per_minute += amount
+	EventBus.state_changed.emit()
 
 
 func add_max_health(amount: float) -> void:
 	max_health += amount
 	EventBus.health_changed.emit(health, max_health)
+	EventBus.state_changed.emit()
 
 
 func advance_better_chair_level() -> void:
 	better_chair_level = min(better_chair_level + 1, 4)
+	EventBus.state_changed.emit()
 
 
 func advance_better_table_level() -> void:
 	better_table_level = min(better_table_level + 1, 4)
+	EventBus.state_changed.emit()
 
 
 func advance_better_bed_level() -> void:
 	better_bed_level = min(better_bed_level + 1, 4)
+	EventBus.state_changed.emit()
 
 
 func idle_familiars() -> int:
@@ -141,6 +161,7 @@ func assign_familiar_to_orb() -> bool:
 		return false
 	familiars_assigned_to_orb += 1
 	add_orb_mana_per_second(1.0)
+	EventBus.state_changed.emit()
 	return true
 
 
@@ -149,11 +170,13 @@ func unassign_familiar_from_orb() -> bool:
 		return false
 	familiars_assigned_to_orb -= 1
 	add_orb_mana_per_second(-1.0)
+	EventBus.state_changed.emit()
 	return true
 
 
 func advance_better_meal_level() -> void:
 	better_meal_level = min(better_meal_level + 1, 4)
+	EventBus.state_changed.emit()
 
 
 func to_dict() -> Dictionary:
@@ -202,3 +225,4 @@ func from_dict(data: Dictionary) -> void:
 	familiars_assigned_to_orb = data.get("familiars_assigned_to_orb", 0)
 	better_meal_level = data.get("better_meal_level", 0)
 	is_blacked_out = false
+	EventBus.state_changed.emit()
