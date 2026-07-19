@@ -40,3 +40,7 @@ InputGuard="*res://autoloads/input_guard.gd"
 RegenManager="*res://autoloads/regen_manager.gd"
 SaveManager="*res://autoloads/save_manager.gd"
 OrbChannelManager="*res://autoloads/orb_channel_manager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
