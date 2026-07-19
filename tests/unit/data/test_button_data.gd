@@ -65,3 +65,21 @@ func test_is_unlock_condition_met_unknown_stat_fails_closed() -> void:
 	# marks it as expected so it doesn't also fail the test.
 	assert_false(ButtonData.is_unlock_condition_met("nonexistent_stat >= 0"))
 	assert_push_error("unknown stat")
+
+
+func test_calculate_cost_table_uses_exact_per_level_costs() -> void:
+	var table: Array[float] = [10.0, 20.0, 50.0, 100.0]
+	assert_eq(ButtonData.calculate_cost(0.0, "table", 0.0, 0, table), 10.0)
+	assert_eq(ButtonData.calculate_cost(0.0, "table", 0.0, 1, table), 20.0)
+	assert_eq(ButtonData.calculate_cost(0.0, "table", 0.0, 2, table), 50.0)
+	assert_eq(ButtonData.calculate_cost(0.0, "table", 0.0, 3, table), 100.0)
+
+
+func test_calculate_cost_table_clamps_past_the_last_entry() -> void:
+	var table: Array[float] = [10.0, 20.0, 50.0, 100.0]
+	assert_eq(ButtonData.calculate_cost(0.0, "table", 0.0, 99, table), 100.0)
+
+
+func test_calculate_cost_table_empty_falls_back_to_base_cost() -> void:
+	assert_eq(ButtonData.calculate_cost(5.0, "table", 0.0, 0, []), 5.0)
+	assert_push_error("cost_table")

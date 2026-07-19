@@ -7,6 +7,7 @@ extends Resource
 @export var base_cost: float
 @export var cost_scaling: String
 @export var cost_step: float
+@export var cost_table: Array[float] = []
 @export var cooldown_sec: float
 @export var unlock_condition: String
 @export var effect_id: String
@@ -22,7 +23,7 @@ extends Resource
 @export var count_seed_source: String
 
 
-static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int) -> float:
+static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: float, count: int, cost_table: Array[float] = []) -> float:
 	match cost_scaling:
 		"linear":
 			return base_cost + (cost_step * count)
@@ -30,6 +31,12 @@ static func calculate_cost(base_cost: float, cost_scaling: String, cost_step: fl
 			return base_cost * pow(2, count)
 		"fixed":
 			return base_cost
+		"table":
+			if cost_table.is_empty():
+				push_error("ButtonData: cost_scaling \"table\" requires a non-empty cost_table")
+				return base_cost
+			var index: int = min(count, cost_table.size() - 1)
+			return cost_table[index]
 		_:
 			push_error("ButtonData: unknown cost_scaling \"%s\"" % cost_scaling)
 			return base_cost

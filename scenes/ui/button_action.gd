@@ -97,7 +97,7 @@ func _build_label_text() -> String:
 	var label := data.labels[label_index]
 	if data.cost_type == "none":
 		return label
-	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
+	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count(), data.cost_table)
 	return "%s (%s %s)" % [label, _format_cost(cost), data.cost_type]
 
 
@@ -120,7 +120,7 @@ func _is_disabled() -> bool:
 
 
 func _can_afford() -> bool:
-	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
+	var cost := ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count(), data.cost_table)
 	match data.cost_type:
 		"mana":
 			return GameState.mana >= cost
@@ -149,7 +149,7 @@ func _handle_click() -> void:
 		return
 	var cost := 0.0
 	if data.cost_type != "none":
-		cost = ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count())
+		cost = ButtonData.calculate_cost(data.base_cost, data.cost_scaling, data.cost_step, _cost_count(), data.cost_table)
 		if not _deduct_cost(cost):
 			return
 	if not EffectHandler.run_effect(data.effect_id):
