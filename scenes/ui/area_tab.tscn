@@ -25,6 +25,7 @@ anchor_bottom = 1.0
 [node name="StatBar" parent="Root" instance=ExtResource("2")]
 
 [node name="Content" type="HBoxContainer" parent="Root"]
+theme_override_constants/separation = 32
 
 [node name="ButtonGrid" type="HBoxContainer" parent="Root/Content"]
 theme_override_constants/separation = 32
