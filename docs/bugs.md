@@ -20,14 +20,3 @@ New entries are appended at the end of this file, each preceded by a `---` horiz
 `sync-tickets` replaces "GitHub issue: pending sync" with the real issue number the moment it creates that bug's issue.
 
 No bugs have been logged yet.
-
----
-
-## Bug 14 — [DEMO — placeholder, will be removed after the walkthrough] Log panel scrollbar doesn't stick to bottom
-**Found:** 2026-07-19
-**Status:** Open
-**Description:** DEMO CONTENT for Task 12's dry-run walkthrough only.
-**Root cause (hypothesis):** `scenes/ui/log_panel.gd` likely doesn't call `scroll_to_line()` (or equivalent) on `line_added`.
-**Root cause (confirmed):**
-**Fix summary:**
-**Ticket:** Bug 14 in docs/tickets.md · GitHub issue: #16
