@@ -10,3 +10,9 @@ text = "Mana: 0"
 
 [node name="HealthLabel" type="Label" parent="."]
 text = "Health: 50 / 50"
+
+[node name="ResetButton" type="Button" parent="."]
+text = "Reset Game"
+
+[node name="ResetConfirmDialog" type="ConfirmationDialog" parent="."]
+dialog_text = "Reset all progress? This cannot be undone."

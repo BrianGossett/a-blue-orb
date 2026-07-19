@@ -9,10 +9,12 @@ const BUTTON_ACTION_SCENE := preload("res://scenes/ui/button_action.tscn")
 @onready var _description_label: RichTextLabel = $Root/Content/RoomInfo/Description
 
 var _furniture_fragments: Array[String] = []
+var _dynamic_buttons: Array[Node] = []
 
 
 func _ready() -> void:
 	EventBus.house_tier_changed.connect(_on_house_tier_changed)
+	EventBus.game_reset.connect(_on_game_reset)
 	if area_data:
 		_apply_area_data()
 
@@ -42,7 +44,15 @@ func _on_house_tier_changed(_new_tier: int) -> void:
 	_update_tab_title()
 
 
+func _on_game_reset() -> void:
+	if area_data:
+		_apply_area_data()
+
+
 func _load_buttons() -> void:
+	for button in _dynamic_buttons:
+		button.queue_free()
+	_dynamic_buttons.clear()
 	var dir_path := "res://data/buttons/%s/" % area_data.id
 	var dir := DirAccess.open(dir_path)
 	if dir == null:
@@ -61,6 +71,7 @@ func _load_buttons() -> void:
 		var instance: Button = BUTTON_ACTION_SCENE.instantiate()
 		instance.set_data(button_data)
 		instance.one_shot_purchased.connect(_on_one_shot_purchased)
+		_dynamic_buttons.append(instance)
 		if button_data.button_column == 1:
 			_column_actions.add_child(instance)
 		else:

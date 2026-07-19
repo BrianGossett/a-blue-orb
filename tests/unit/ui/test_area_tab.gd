@@ -90,3 +90,58 @@ func test_room_description_rebuilds_as_one_shot_purchases_accumulate() -> void:
 	bed.room_description_fragment = "a bed"
 	tab._on_one_shot_purchased(bed)
 	assert_eq(tab._description_label.text, "This is a bare test room. The room has a chair, a table, and a bed.", "three-item join uses an Oxford comma")
+
+
+func test_game_reset_reloads_buttons_without_duplicating_or_destroying_orb_channeling() -> void:
+	var tab: Control = add_child_autofree(load("res://scenes/ui/area_tab.tscn").instantiate())
+	var area_data: AreaData = load("res://data/areas/house.tres")
+	tab.set_area_data(area_data)
+
+	var orb_channeling_before: Node = tab._column_upgrades.get_node("OrbChanneling")
+	assert_not_null(orb_channeling_before, "OrbChanneling should exist before any reset")
+
+	# Buy Chair so it hides (one_shot) — confirms the reset actually
+	# brings a purchased, hidden furniture button back.
+	GameState.add_familiars(1)
+	GameState.add_food_eaten()
+	GameState.add_food_eaten()
+	var chair_button: Button = _find_button_by_id(tab._column_actions, "chair")
+	assert_not_null(chair_button, "Chair button should exist and be visible before purchase")
+	chair_button._handle_click()
+	assert_null(_find_button_by_id(tab._column_actions, "chair"), "Chair should be gone (hidden+freed on next reload) after purchase")
+
+	var actions_count_before_reset: int = tab._column_actions.get_child_count()
+
+	# EventBus.game_reset alone carries no state-reset behavior — in
+	# production it's SaveManager.reset_game() that resets GameState
+	# *before* emitting the signal. Mirror that ordering here (without
+	# calling reset_game() itself, to keep this test focused on
+	# area_tab.gd's reload behavior, not Task 1's already-covered logic)
+	# so the chair's purchased-upgrade flag is actually cleared and it can
+	# genuinely reappear.
+	GameState.from_dict({})
+	EventBus.game_reset.emit()
+	await get_tree().process_frame  # let queue_free()'d nodes actually leave the tree
+
+	var orb_channeling_after: Node = tab._column_upgrades.get_node_or_null("OrbChanneling")
+	assert_eq(orb_channeling_after, orb_channeling_before, "the same OrbChanneling instance must survive a reload, not be destroyed and never recreated")
+
+	assert_not_null(_find_button_by_id(tab._column_actions, "chair"), "Chair should reappear after reset, since it's no longer purchased")
+	# The hidden-but-not-yet-freed Chair from before the reset already
+	# counted toward actions_count_before_reset (hide() doesn't remove it
+	# from the tree — only the reload's clearing loop does that). So a
+	# clean, duplicate-free reload swaps it 1-for-1 with a fresh, visible
+	# Chair: the total count stays the same, it doesn't grow by one.
+	assert_eq(tab._column_actions.get_child_count(), actions_count_before_reset, "same button count after reload — the old hidden Chair is replaced 1-for-1, not duplicated")
+
+
+func _find_button_by_id(container: Node, id: String) -> Button:
+	# A one-shot button is hidden (visible = false) immediately on purchase
+	# but only actually removed from the tree on the *next* _load_buttons()
+	# call, so "gone" here must mean "not currently shown", not just
+	# "not present as a node" — otherwise a freshly-hidden-but-not-yet-freed
+	# purchased button would still be found.
+	for child in container.get_children():
+		if child is Button and child.visible and "data" in child and child.data != null and child.data.id == id:
+			return child
+	return null
