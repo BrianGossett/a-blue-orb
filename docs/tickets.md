@@ -410,3 +410,28 @@ Split off from Ticket 9b (issue #13) — both items here need a real design/arch
 - Confirm the log panel format exactly matches the mockup: `[HH:MM:SS] you gingerly touch the orb.` (lowercase after the timestamp, matching the mock's tone — flag if this was built differently and needs a fix).
 - Flag anything discovered during build that should update `docs/architecture.md` (per that doc's own workflow note in §8) — don't let the doc silently go stale.
 
+
+---
+
+## Bug 13 — Buttons don't refresh when an unrelated action makes their unlock_condition true
+**Status:** Not yet synced
+
+**Description:** Buttons whose `unlock_condition` depends on a stat another button/action changes (food_eaten_count, familiars, mana, has_upgrade, etc.) stay visually disabled even after the condition is actually satisfied. They only "un-stick" if something happens to independently trigger that specific button's own `_refresh()` — e.g. surviving a blackout, since `EventBus.health_depleted`/`blackout_ended` are the only global signals every `button_action.gd` instance listens to regardless of its own data.
+
+**Repro steps:**
+1. Start a fresh session (or one with House content loaded).
+2. Eat bread twice (`food_eaten_count` reaches 2, satisfying `chair.tres`'s `unlock_condition = "food_eaten_count >= 2"`).
+3. Observe the Chair button: it stays greyed out/disabled instead of becoming clickable, even though the condition is now true.
+4. Same pattern applies to Table (`food_eaten_count >= 5 && familiars >= 3`), Bed (`familiars >= 5`), Confidence 2–4 (`confidence_tier >= N`), and Better Chair/Table/Bed (`has_upgrade(...)`) — any button without a `tier_source` set, whose unlock condition depends on state that changes via a *different* button's click.
+
+**Expected vs. Actual:** Expected: a button whose `unlock_condition` becomes true re-evaluates and enables itself promptly (on the very next relevant state change, not just eventually). Actual: it only re-evaluates if something coincidentally calls that specific button instance's own `_refresh()` — its own click (can't happen, it's disabled), `tier_source` signal (only 2 buttons use this), or a blackout/recovery cycle (unrelated to the unlock condition at all).
+
+**Root cause hypothesis:** `scenes/ui/button_action.gd`'s `_ready()` only connects `EventBus.health_depleted`/`EventBus.blackout_ended` (both call `_refresh()`) and, for buttons with `tier_source` set, `EventBus.confidence_tier_changed`/`house_tier_changed` (via `_connect_tier_source()`). There is no general mechanism that re-evaluates `_is_disabled()` (which checks `ButtonData.is_unlock_condition_met()`) when the specific stats a button's own `unlock_condition` references change from elsewhere — e.g. `food_eaten_count`, `familiars`, `mana`, or `has_upgrade(...)` results. This gap was flagged during Ticket 9c's final review as a known, deferred issue intended for Ticket 12 (Polish/Cross-Check Pass), but Ticket 12 hasn't addressed it yet.
+
+**Affected files/scenes:** `scenes/ui/button_action.gd` (the missing reactive-refresh mechanism), `autoloads/event_bus.gd` (may need broader signals or a different refresh trigger), every `.tres` in `data/buttons/house/` with a non-empty `unlock_condition` and no `tier_source`.
+
+**Acceptance criteria:**
+- [ ] After eating bread twice, the Chair button becomes clickable without requiring any unrelated action (like a blackout) to refresh it.
+- [ ] The same holds for Table, Bed, Confidence 2–4, Better Chair/Table/Bed, and any other button whose `unlock_condition` depends on a stat that changes via a different button's action.
+- [ ] The fix generalizes — it shouldn't require hardcoding a signal connection per stat per button; a new stat added later with an `unlock_condition` referencing it should work without touching `button_action.gd` again.
+- [ ] A GUT test locks this down: mutate the relevant `GameState` stat directly (not through the gated button itself), and confirm an already-instantiated `button_action.tscn` with a matching `unlock_condition` becomes enabled without any other trigger.

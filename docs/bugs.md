@@ -19,4 +19,13 @@ New entries are appended at the end of this file, each preceded by a `---` horiz
 
 `sync-tickets` replaces "GitHub issue: pending sync" with the real issue number the moment it creates that bug's issue.
 
-No bugs have been logged yet.
+---
+
+## Bug 13 — Buttons don't refresh when an unrelated action makes their unlock_condition true
+**Found:** 2026-07-19
+**Status:** Open
+**Description:** Buttons whose `unlock_condition` depends on a stat another button/action changes stay visually disabled even after the condition is satisfied — they only refresh if something unrelated (like a blackout) coincidentally triggers that button's own `_refresh()`.
+**Root cause (hypothesis):** `button_action.gd`'s `_ready()` only connects to `EventBus.health_depleted`/`blackout_ended` and, for `tier_source` buttons, `confidence_tier_changed`/`house_tier_changed` — there's no general mechanism re-evaluating `unlock_condition` when the specific stats it references change elsewhere.
+**Root cause (confirmed):**
+**Fix summary:**
+**Ticket:** Bug 13 in docs/tickets.md · GitHub issue: pending sync
