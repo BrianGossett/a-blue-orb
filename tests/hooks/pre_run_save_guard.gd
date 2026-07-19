@@ -1,4 +1,8 @@
 extends GutHookScript
+# Paired with post_run_save_guard.gd. This guarantee holds on a graceful
+# suite exit only — if the process is killed between this hook writing the
+# backup and the post-run hook restoring it, the real save.json is left
+# test-mutated and a stray .gut_backup file remains until the next run.
 
 const SAVE_PATH := "user://save.json"
 const BACKUP_PATH := "user://save.json.gut_backup"
