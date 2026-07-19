@@ -134,6 +134,8 @@ func _on_pressed() -> void:
 
 
 func _handle_click() -> void:
+	if not visible:
+		return
 	if not InputGuard.try_register_click():
 		return
 	if _is_blacked_out:
