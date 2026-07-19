@@ -28,4 +28,4 @@ New entries are appended at the end of this file, each preceded by a `---` horiz
 **Root cause (hypothesis):** `button_action.gd`'s `_ready()` only connects to `EventBus.health_depleted`/`blackout_ended` and, for `tier_source` buttons, `confidence_tier_changed`/`house_tier_changed` — there's no general mechanism re-evaluating `unlock_condition` when the specific stats it references change elsewhere.
 **Root cause (confirmed):**
 **Fix summary:**
-**Ticket:** Bug 13 in docs/tickets.md · GitHub issue: pending sync
+**Ticket:** Bug 13 in docs/tickets.md · GitHub issue: #17
