@@ -27,6 +27,7 @@ anchor_bottom = 1.0
 [node name="Content" type="HBoxContainer" parent="Root"]
 
 [node name="ButtonGrid" type="HBoxContainer" parent="Root/Content"]
+theme_override_constants/separation = 32
 
 [node name="ColumnActions" type="VBoxContainer" parent="Root/Content/ButtonGrid"]
 
