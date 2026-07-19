@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/orb_channeling.gd" id="1"]
+
+[node name="OrbChanneling" type="Control"]
+script = ExtResource("1")
+
+[node name="Root" type="HBoxContainer" parent="."]
+
+[node name="NameLabel" type="Label" parent="Root"]
+text = "Orb Channeling"
+
+[node name="DownButton" type="Button" parent="Root"]
+text = "-"
+
+[node name="CountLabel" type="Label" parent="Root"]
+text = "0"
+
+[node name="UpButton" type="Button" parent="Root"]
+text = "+"
+
+[node name="InfoLabel" type="Label" parent="Root"]
+text = "(0 idle)"
