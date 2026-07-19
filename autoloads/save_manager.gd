@@ -27,6 +27,13 @@ func save_game() -> void:
 	file.close()
 
 
+func reset_game() -> void:
+	GameState.from_dict({})
+	save_game()
+	LogManager.push("everything resets. you start anew.")
+	EventBus.game_reset.emit()
+
+
 func load_game() -> bool:
 	if not FileAccess.file_exists("user://save.json"):
 		return false

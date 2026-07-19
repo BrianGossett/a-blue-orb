@@ -132,3 +132,32 @@ func test_better_x_reload_seeding_wired_end_to_end_after_real_load() -> void:
 
 	assert_eq(button.text, data.labels[3],
 		"seeded purchase count from a real load should be reflected in the rendered label")
+
+
+func test_reset_game_restores_defaults_and_persists_them() -> void:
+	GameState.add_mana(50.0)
+	GameState.add_familiars(3)
+	GameState.mark_upgrade_purchased("chair")
+
+	SaveManager.reset_game()
+
+	assert_eq(GameState.mana, 0.0)
+	assert_eq(GameState.familiars, 0)
+	assert_false(GameState.has_upgrade("chair"))
+
+	# Confirm it was actually persisted, not just reset in memory — load
+	# into a second reset first, to prove the file itself now reflects
+	# the reset state rather than the pre-reset values.
+	GameState.add_mana(999.0)
+	SaveManager.load_game()
+	assert_eq(GameState.mana, 0.0, "the save file itself must already reflect the reset, not just live memory")
+
+
+func test_reset_game_emits_game_reset_and_a_log_line() -> void:
+	watch_signals(EventBus)
+	var lines_before: int = LogManager.get_lines().size()
+
+	SaveManager.reset_game()
+
+	assert_signal_emitted(EventBus, "game_reset")
+	assert_gt(LogManager.get_lines().size(), lines_before, "reset should push a flavor line")
