@@ -9,7 +9,7 @@ Turns a tickets markdown file into GitHub issues, one per ticket, safe to re-run
 
 ## Input
 
-A path to a tickets markdown file. If not given, ask for one.
+A path to a tickets markdown file. If not given, default to `docs/tickets.md`. Only ask for a path if `docs/tickets.md` does not exist yet.
 
 ## Ticket file format
 
