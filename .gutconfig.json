@@ -1,0 +1,9 @@
+{
+    "dirs": [
+        "res://tests/unit"
+    ],
+    "include_subdirs": true,
+    "pre_run_script": "res://tests/hooks/pre_run_save_guard.gd",
+    "post_run_script": "res://tests/hooks/post_run_save_guard.gd",
+    "prefix": "test_"
+}
