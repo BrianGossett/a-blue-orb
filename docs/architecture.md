@@ -165,20 +165,19 @@ Pulled directly from the design doc's tables so this doc doubles as the live bal
 | Stop Sitting on the Floor (→ Chair) | 1 familiar | +1 HP regen/min, +1 orb mana gain | Appears after eating food 2x; one-shot, removes button |
 | Something to Eat On (→ Table) | 2 familiars | +2 HP from food, +2 orb mana gain | Appears after 5 food + 3 familiars; one-shot |
 | Somewhere to Rest (→ Bed) | 4 familiars | +20 max HP, +3 orb mana gain | Appears at 5 familiars; one-shot |
-| A Plinth for the Orb | — | Unlocks Orb Channeling assignment (+1 mana/sec per familiar assigned) | Not a button — up/down arrow allocator |
+| Orb Channeling | — | +1 mana/sec per familiar assigned to it | Not a button — up/down arrow allocator; appears once the player has ≥1 familiar (no separate "Plinth" purchase step, unlike the original design doc concept) |
 
 ### House — Column 2 (Upgrades)
 
 | Button | Cost | Effect |
 |---|---|---|
-| Gain Confidence 1 | 10 mana | +3 orb mana gain, +5 HP cost on touch |
-| Gain Confidence 2 | 20 mana | +5 orb mana gain, +5 HP cost |
-| Gain Confidence 3 | 50 mana | +7 orb mana gain, +5 HP cost |
-| Gain Confidence 4 | 100 mana | +10 orb mana gain, +5 HP cost |
+| Gain Confidence | 10/20/50/100 mana per level (×4 max) | +3/+5/+7/+10 orb mana gain per level, +5 HP cost on touch per level |
 | A Better Meal | 10 mana, ×2/upgrade | +5 HP restore per level; gated on matching table tier |
 | A Better Chair | 2 familiars, ×2/upgrade (×4 max) | +1 HP regen/min, +1 orb mana gain per level |
 | A Better Table | 4 familiars, ×2/upgrade (×4 max) | +2 HP from food, +2 orb mana gain per level |
 | A Better Bed | 8 familiars, ×2/upgrade (×4 max) | +20 max HP, +3 orb mana gain per level |
+
+**Known gap, flagged by Ticket 12's cross-check, not yet built:** `house_tier` (and `EventBus.house_tier_changed`, which drives the House tab's title progression through `AreaData.name_progression`) is never advanced by anything currently shipped — `GameState` has no `advance_house_tier()`-style method, and no ticket's content triggers one. The field/signal/tab-title-wiring all exist and work correctly once something calls them; nothing does yet. Needs a follow-up ticket to decide what should trigger house-tier progression (a milestone doesn't exist in the design doc yet) — not built here, since that's new functionality, not a cross-check fix.
 
 ### Table → Food progression
 Rickety Table/Bread → Plain Table/Soup → Sturdy Table/Stew → Fine Table/Roast → Handsome Table/Shepherd's Pie.
