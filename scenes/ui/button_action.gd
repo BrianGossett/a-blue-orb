@@ -63,6 +63,8 @@ func _connect_tier_source() -> void:
 		"house_tier":
 			EventBus.house_tier_changed.connect(_on_tier_source_changed)
 			set_purchase_count(GameState.house_tier)
+		"better_table_level":
+			set_purchase_count(GameState.better_table_level)
 
 
 func _on_tier_source_changed(new_tier: int) -> void:
@@ -80,6 +82,8 @@ func _on_blackout_ended() -> void:
 
 
 func _on_state_changed() -> void:
+	if data != null and data.tier_source == "better_table_level":
+		_purchase_count = GameState.better_table_level
 	_refresh()
 
 

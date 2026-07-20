@@ -111,6 +111,18 @@ func test_effect_better_meal_fails_once_it_catches_up_to_better_table_level() ->
 	assert_eq(GameState.food_heal_bonus, 5.0, "guard must not mutate state further")
 
 
+func test_eat_food_log_line_names_the_current_food_tier() -> void:
+	GameState.advance_better_table_level()
+	GameState.advance_better_table_level()
+	var lines_before: int = LogManager.get_lines().size()
+
+	EffectHandler.run_effect("eat_food")
+
+	var last_line: String = LogManager.get_lines()[-1]
+	assert_gt(LogManager.get_lines().size(), lines_before)
+	assert_string_contains(last_line, "stew", "at better_table_level 2, the log should name stew, not bread")
+
+
 func test_confidence_4_touch_orb_costs_25_hp() -> void:
 	# Ticket 9's own explicit acceptance criterion: "at Confidence 4,
 	# touching the orb costs 25 HP, not 5" — orb_health_cost_per_click

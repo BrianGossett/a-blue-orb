@@ -47,9 +47,11 @@ func _effect_summon_familiar() -> bool:
 
 
 func _effect_eat_food() -> bool:
+	const FOOD_NAMES: Array[String] = ["bread", "soup", "stew", "roast", "shepherd's pie"]
 	GameState.add_health(10.0 + GameState.food_heal_bonus)
 	GameState.add_food_eaten()
-	LogManager.push("you eat the bread. it is simple, but satisfying.")
+	var food_index: int = min(GameState.better_table_level, FOOD_NAMES.size() - 1)
+	LogManager.push("you eat the %s. it is simple, but satisfying." % FOOD_NAMES[food_index])
 	return true
 
 

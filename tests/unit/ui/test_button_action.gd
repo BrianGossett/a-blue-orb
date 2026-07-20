@@ -229,6 +229,30 @@ func test_cooldown_bar_fills_as_the_cooldown_counts_down() -> void:
 	assert_false(button._cooldown_bar.visible, "bar should hide once the cooldown ends")
 
 
+func test_eat_bread_tres_label_progresses_with_better_table_level() -> void:
+	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
+	var data: ButtonData = load("res://data/buttons/house/eat_bread.tres")
+	button.set_data(data)
+
+	assert_eq(button.text, "Eat Bread", "tier 0 (no Better Table purchases yet) should read Bread")
+
+	GameState.advance_better_table_level()
+	EventBus.state_changed.emit()
+	assert_eq(button.text, "Eat Soup", "tier 1")
+
+	GameState.advance_better_table_level()
+	EventBus.state_changed.emit()
+	assert_eq(button.text, "Eat Stew", "tier 2")
+
+	GameState.advance_better_table_level()
+	EventBus.state_changed.emit()
+	assert_eq(button.text, "Eat Roast", "tier 3")
+
+	GameState.advance_better_table_level()
+	EventBus.state_changed.emit()
+	assert_eq(button.text, "Eat Shepherd's Pie", "tier 4, the max")
+
+
 func test_cooldown_bar_never_shows_for_buttons_with_no_cooldown() -> void:
 	var button: Button = add_child_autofree(load("res://scenes/ui/button_action.tscn").instantiate())
 	var data := ButtonData.new()

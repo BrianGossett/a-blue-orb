@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = "eat_bread"
-labels = Array[String](["Eat Bread"])
+labels = Array[String](["Eat Bread", "Eat Soup", "Eat Stew", "Eat Roast", "Eat Shepherd's Pie"])
 cost_type = "none"
 base_cost = 0.0
 cost_scaling = "fixed"
@@ -18,6 +18,6 @@ flavor_lines = Array[String]([])
 one_shot = false
 button_column = 1
 sort_order = 3
-tier_source = ""
+tier_source = "better_table_level"
 cost_count_source = ""
 room_description_fragment = ""
