@@ -46,7 +46,7 @@ func test_recovery_restores_health_and_emits_blackout_ended() -> void:
 	# Bypasses the real Timer's wait by calling the timeout handler directly.
 	overlay._on_recovery_timeout()
 
-	assert_eq(GameState.health, health_before + 1.0, "recovery should add exactly 1.0 health")
+	assert_eq(GameState.health, health_before + Constants.BLACKOUT_RECOVERY_HEAL_AMOUNT, "recovery should add exactly Constants.BLACKOUT_RECOVERY_HEAL_AMOUNT health")
 	assert_false(GameState.is_blacked_out, "recovery should clear the blackout flag")
 	assert_signal_emitted(EventBus, "blackout_ended")
 

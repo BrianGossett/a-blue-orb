@@ -29,7 +29,7 @@ func _on_health_depleted() -> void:
 
 
 func _on_recovery_timeout() -> void:
-	GameState.add_health(1.0)
+	GameState.add_health(Constants.BLACKOUT_RECOVERY_HEAL_AMOUNT)
 	GameState.exit_blackout()
 	var tween := create_tween()
 	tween.tween_property(_fade_rect, "modulate:a", 0.0, FADE_DURATION_SEC)
