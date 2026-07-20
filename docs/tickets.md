@@ -435,3 +435,20 @@ Split off from Ticket 9b (issue #13) — both items here need a real design/arch
 - [ ] The same holds for Table, Bed, Confidence 2–4, Better Chair/Table/Bed, and any other button whose `unlock_condition` depends on a stat that changes via a different button's action.
 - [ ] The fix generalizes — it shouldn't require hardcoding a signal connection per stat per button; a new stat added later with an `unlock_condition` referencing it should work without touching `button_action.gd` again.
 - [ ] A GUT test locks this down: mutate the relevant `GameState` stat directly (not through the gated button itself), and confirm an already-instantiated `button_action.tscn` with a matching `unlock_condition` becomes enabled without any other trigger.
+
+---
+
+## Ticket 14 — Wire up house_tier progression
+**Status:** Not yet synced
+
+**Description:** `GameState.house_tier` and `EventBus.house_tier_changed` already exist and are fully wired on the consuming end — `area_tab.gd` correctly updates the House tab's title via `AreaData.name_progression` (`"A Small Shelter"` → `"A Lonely Hut"` → `"A Sturdy Cottage"` → `"A Comfortable House"` → `"A Fine Residence"`, from `data/areas/house.tres`) whenever the signal fires, and `house_tier` round-trips correctly through save/load. But nothing anywhere advances it — `GameState` has no `advance_house_tier()`-style method, and no shipped effect or system ever calls one. Found and documented (not fixed, out of scope) during Ticket 12's cross-check pass — see `docs/architecture.md` §6's "Known gap" note.
+
+**Context/constraints:** `docs/design_doc.md`'s House name progression list is explicitly marked "in progress, we don't need to use any/all of these" — there is no locked-in trigger condition in either the design doc or architecture doc. **The trigger mechanism is an open design question, not decided by this ticket** — whoever picks this up needs to check in on what should advance `house_tier` (candidates worth considering, none pre-selected: owning all three base furniture pieces (Chair+Table+Bed), a mana/familiar milestone, total upgrades purchased, something else entirely) before implementing. Once decided, the mechanical shape is small and already has a precedent to follow: a new `GameState.advance_house_tier()` method (mirroring `advance_confidence_tier()`'s `min(x+1, 4)` clamp-and-emit pattern) called from wherever the trigger condition is detected.
+
+**Files/scenes likely touched:** `autoloads/game_state.gd` (new method), whatever system ends up detecting the trigger condition (an existing `EffectHandler` function, a new small check, or similar — depends on what's decided).
+
+**Acceptance criteria:**
+- [ ] A trigger condition for house_tier advancement is decided (with the project owner) and documented in `docs/architecture.md` before implementation.
+- [ ] `GameState` gains a way to advance `house_tier` (clamped at the max tier, matching `advance_confidence_tier()`'s pattern) that emits `EventBus.house_tier_changed`.
+- [ ] The House tab's title visibly progresses through all 5 names during a real playthrough once the trigger condition is met each time.
+- [ ] A GUT test locks down the new advancement method's clamp-and-emit behavior, matching the existing `test_game_state.gd` coverage style for `advance_confidence_tier()`.
